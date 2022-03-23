@@ -975,9 +975,10 @@ package WeaponDroping
 	function servercmdDropTool(%client,%slot)
 	{
     %player = %client.player;
-    if(isObject(%player) && isObject(%image = %player.getMountedImage(0)) && (isObject(%image.safetyImage) || isObject(%image.scopingImage)))
+    if(isObject(%player) && isObject(%image = %player.getMountedImage(0)) && %image.item.aebase)
     {
       %player.unmountImage(0);
+	  %player.stopAudio(0);
     }
     return Parent::servercmdDropTool(%client,%slot);
 	}
