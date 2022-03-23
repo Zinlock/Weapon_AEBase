@@ -1789,7 +1789,7 @@ function serverCmdGunInfo(%client)
 
 	//messageClient(%client, '', "<font:arial:18>\c6" @ "Gun Info:");
 	messageClient(%client, '', "<font:consolas bold:36><color:" @ rgb2hex(%item.uiColor) @ ">" @ %item.uiName);
-	messageClient(%client, '', %format @ "Chambered in<font:arial:20>\c6: \c2" @ %item.AEAmmo @ "\c6x " @ %item.AEType.AEAmmo @ "\c6 rounds");
+	messageClient(%client, '', %format @ "Chambered in<font:arial:20>\c6: \c2" @ %item.AEAmmo @ "\c6x " @ %item.AEType.AEAmmo @ "\c6 Rounds");
 	messageClient(%client, '', %format @ "Fire rate<font:arial:20>\c6: " @ %rpmcol @ %item.RPM @ "\c6 rpm");
 	messageClient(%client, '', %format @ "Muzzle velocity<font:arial:20>\c6: " @ %velocitycol @ %image.projectileVelocity @ "\c6 u/s");
 
@@ -1807,7 +1807,7 @@ function serverCmdGunInfo(%client)
 	}
 
 	messageClient(%client, '', %format @ "Bullet Spread<font:arial:20>\c6: "
-	@ %spreadcol @ mFloatLength(%spreadval / 10, 1) @ "\c6 - " @ %spreadmaxcol @ mFloatLength(%spreadmaxval / 10, 1) @ "<font:arial:16>\c6 (" @ %item.recoil @ " recoil)");
+	@ %spreadcol @ mFloatLength(%spreadval / 10, 1) @ "\c6 - " @ %spreadmaxcol @ mFloatLength(%spreadmaxval / 10, 1) @ "<font:arial:16>\c6 (" @ %item.recoil @ " Recoil)");
 
 	if(trim(%desc = %item.description) !$= "")
 	{
