@@ -978,7 +978,6 @@ package WeaponDroping
     if(isObject(%player) && isObject(%image = %player.getMountedImage(0)) && %image.item.aebase)
     {
       %player.unmountImage(0);
-	  %player.stopAudio(0);
     }
     return Parent::servercmdDropTool(%client,%slot);
 	}
@@ -1361,10 +1360,7 @@ function WeaponImage::AEUnmountCleanup(%this, %obj, %slot)
 		else
 			%obj.client.centerPrint("", 1);
 	}
-
-	if(%obj.showFireMode)
-		
-		
+			
 
 	if(%obj.FireLoop)
         %obj.playAudio(0, %this.loopingEndSound);
