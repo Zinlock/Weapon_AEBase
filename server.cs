@@ -956,6 +956,9 @@ function Item::collisionLoop(%this, %before) // epicly borrowed from jack noir's
 {
 	cancel(%this.collisionLoop);
 
+	if(%this.static)
+		return;
+	
 	%data = %this.getDatablock();
 	%now = vectorLen(%this.getVelocity());
 
@@ -967,7 +970,7 @@ function Item::collisionLoop(%this, %before) // epicly borrowed from jack noir's
 			serverPlay3D(getWord((%sis = %data.softImpactSound), getRandom(0, getWordCount(%sis))), %this.getPosition());
 	}
 
-	%this.collisionLoop = %this.schedule(50, "collisionLoop", %now);
+	%this.collisionLoop = %this.schedule((%now > 0.1 ? 50 : 200), "collisionLoop", %now);
 }
 
 package WeaponDroping
