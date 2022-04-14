@@ -1199,7 +1199,7 @@ function Player::AEFire(%obj,%this,%slot)
 			if(%projType == 4 && %this.staticUnitsPerSecond > 0 && (%pdata.getID() == AEProjectile.getID() || %pdata.getID() == AETrailedProjectile.getID()))
 			{
 				%velInc = %this.staticUnitsPerSecond;
-				%pdata = AEProjectile;
+				%pdata = AETraillessProjectile;
 			}
 
 			%projectile = new Projectile ()

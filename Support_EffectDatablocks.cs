@@ -643,40 +643,9 @@ function AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 
 // non tracer projectile
 
-datablock ProjectileData(AEProjectile)
+datablock ProjectileData(AEProjectile : AETrailedProjectile)
 {
-    projectileShapeName = "base/data/shapes/empty.dts";
-    directDamage        = 50;
-    directDamageType    = $DamageType::AE;
-    radiusDamageType    = $DamageType::AE;
-
-    brickExplosionRadius = 0;
-    brickExplosionImpact = true;          //destroy a brick if we hit it directly?
-    brickExplosionForce  = 10;
-    brickExplosionMaxVolume = 1;          //max volume of bricks that we can destroy
-    brickExplosionMaxVolumeFloating = 2;  //max volume of bricks that we can destroy if they aren't connected to the ground
-
-    impactImpulse         = 50; //150
-    verticalImpulse     = 50;
-    explosion           = AEMissGunExplosion;
-    bloodExplosion      = AEHitGunExplosion;
-
-    muzzleVelocity      = 50;
-    velInheritFactor    = 0;
-
-    armingDelay         = 0;
-    lifetime            = 1000;
-    fadeDelay           = 500;
-    bounceElasticity    = 0.5;
-    bounceFriction      = 0.20;
-    isBallistic         = true;
-    gravityMod = 0.5;
-
-    particleEmitter     = AESilencedTrailEmitter;
-
-    hasLight    = false;
-    lightRadius = 3.0;
-    lightColor  = "0 0 0.5";
+  particleEmitter     = AESilencedTrailEmitter;
 };
 
 function AEProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
@@ -689,40 +658,19 @@ function AEProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 	AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal);
 }
 
-// alt rifle versions that have longer lifetimes
+// science projectile
 
-// non tracer projectile but rifle
-
-datablock ProjectileData(AERifleProjectile : AEProjectile)
+datablock ProjectileData(AETraillessProjectile : AETrailedProjectile)
 {
-    lifetime            = 5000;
-    fadeDelay           = 4500;
+  particleEmitter = "";
 };
 
-function AERifleProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
+function AETraillessProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
 {
 	AETrailedProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity);
 }
 
-function AERifleProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
-{
-	AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal);
-}
-
-// tracer projectile but rifle
-
-datablock ProjectileData(AETrailedRifleProjectile : AETrailedProjectile)
-{
-    lifetime            = 5000;
-    fadeDelay           = 4500;
-};
-
-function AETrailedRifleProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
-{
-	AETrailedProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity);
-}
-
-function AETrailedRifleProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
+function AETraillessProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 {
 	AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal);
 }
