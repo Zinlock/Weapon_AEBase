@@ -11,7 +11,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Player Screenshake Multiplier", "AEBase - Player", "$Pref::AEBase::playerScreenshakeMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Player Tagging Strength Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Player Tagging Recovery Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagRecoveryMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3", "Weapon_AEBase", 3, false, false, "");
+		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
 		RTB_registerPref("Bot Damage Multiplier", "AEBase - Bot", "$Pref::AEBase::botDamageMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Bot Damage to Vehicle Multiplier", "AEBase - Bot", "$Pref::AEBase::botVehicleDamageMult", "int 0 50", "Weapon_AEBase", 0.25, false, false, "");
@@ -21,7 +21,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Bot Recoil Multiplier", "AEBase - Bot", "$Pref::AEBase::botRecoilMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Bot Tagging Strength Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Bot Tagging Recovery Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagRecoveryMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Spawn Bot Projectiles As", "AEBase - Bot", "$Pref::AEBase::projectilesAsBot", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3", "Weapon_AEBase", 3, false, false, "");
+		RTB_registerPref("Spawn Bot Projectiles As", "AEBase - Bot", "$Pref::AEBase::projectilesAsBot", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
 		RTB_registerPref("HUD Style","AEBase - HUD","$Pref::AEBase::HUD","list AEBase 0 T+T 1 Adventure_Pack 2 Rallypack 3 SWeps 4 GCats 5 Verbal 6 BKT 7 Blockality 8 Nekram 9 Tactical 10 None 11","Weapon_AEBase",0,0,1);
 		RTB_registerPref("HUD Position","AEBase - HUD","$Pref::AEBase::HUDPos","list Bottom_Right 0 Bottom_Left 1 Bottom_Center 2 Center 3 Center_Right 4 Center_Left 5","Weapon_AEBase",0,0,1);
