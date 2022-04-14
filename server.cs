@@ -11,7 +11,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Player Screenshake Multiplier", "AEBase - Player", "$Pref::AEBase::playerScreenshakeMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Player Tagging Strength Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Player Tagging Recovery Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagRecoveryMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
+		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs","list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
 		RTB_registerPref("Bot Damage Multiplier", "AEBase - Bot", "$Pref::AEBase::botDamageMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Bot Damage to Vehicle Multiplier", "AEBase - Bot", "$Pref::AEBase::botVehicleDamageMult", "int 0 50", "Weapon_AEBase", 0.25, false, false, "");
@@ -920,14 +920,13 @@ package WeaponFeatures
 			%cl.schedule(0, setControlCameraFOV, %cl.aeReferenceFOV);
 	}
 
-	// function Projectile::onAdd(%obj,%a,%b)
-	// {
-	// 	if(%obj.velocityIncrease > 0)
-	// 	{
-	// 		%obj.initialvelocity=vectorscale(vectorNormalize(%obj.initialvelocity),%obj.velocityIncrease + 200);
-	// 	}
-	// 	Parent::onAdd(%obj,%a,%b);
-	// }
+	function Projectile::onAdd(%obj,%a,%b)
+	{
+		if(%obj.velocityIncrease > 0)
+			%obj.initialvelocity = vectorscale(vectorNormalize(%obj.initialvelocity),%obj.velocityIncrease);
+
+		Parent::onAdd(%obj,%a,%b);
+	}
 };
 ActivatePackage(WeaponFeatures);
 
@@ -1161,7 +1160,7 @@ function Player::AEFire(%obj,%this,%slot)
 
 		%projType = (%obj.IsA("Player") ? $Pref::AEBase::projectilesAs : $Pref::AEBase::projectilesAsBot);
 
-		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan || %projType == 0)
+		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan || %projType == 0 || %projType == 4)
 		{
 			%velocity = vectorScale(%vector, %this.projectileVelocity);
 
@@ -1193,12 +1192,19 @@ function Player::AEFire(%obj,%this,%slot)
 			if(%headshotMult <= 0)
 				%headshotMult = 1;
 
-			if(%this.projectileVelocity > 200)
-				%velInc = %this.projectileVelocity - 200;
+			%velInc = 0;
+			
+			%pdata = %this.projectile;
+
+			if(%projType == 4 && %this.staticUnitsPerSecond > 0 && (%pdata.getID() == AEProjectile.getID() || %pdata.getID() == AETrailedProjectile.getID()))
+			{
+				%velInc = %this.staticUnitsPerSecond;
+				%pdata = AEProjectile;
+			}
 
 			%projectile = new Projectile ()
 			{
-				dataBlock = %this.projectile;
+				dataBlock = %pdata;
 				initialVelocity = vectorAdd(%velocity, "0 0 " @ %this.projectileZOffset);
 				initialPosition = %obj.getMuzzlePoint(%slot);
 				sourcePosition = %obj.getMuzzlePoint(%slot);
