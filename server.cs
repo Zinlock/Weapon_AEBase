@@ -1364,7 +1364,8 @@ function WeaponImage::AEUnmountCleanup(%this, %obj, %slot)
 	else
 	{
 		%obj.client.applyBodyParts();
-		if($Pref::AEBase::HUDPos <= 2)
+		if($Pref::AEBase::HUD != 11)
+		if($Pref::AEBase::HUDPos <= 2) 
 			%obj.client.bottomPrint("", 1, 1);
 		else
 			%obj.client.centerPrint("", 1);
