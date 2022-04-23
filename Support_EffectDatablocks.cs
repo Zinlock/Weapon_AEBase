@@ -663,6 +663,7 @@ function AEProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 datablock ProjectileData(AETraillessProjectile : AETrailedProjectile)
 {
   particleEmitter = "";
+  bulletHolesEnabled = true;
 };
 
 function AETraillessProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
