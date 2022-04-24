@@ -621,8 +621,8 @@ function AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 
 	%dism = %damage >= $Pref::RBloodMod::DismemberDamage || (%obj.RDismemberBody && !%headshot || %obj.RDismemberHead && %headshot);
 
-	if(isFunction("Player", RBloodSimulate) && (%col.IsA("Player") || %col.IsA("AIPlayer")))
-		%col.RBloodSimulate(%pos, vectorNormalize(%obj.getVelocity()), %this, %obj.getScale(), %dism);
+//	if(isFunction("Player", RBloodSimulate) && (%col.IsA("Player") || %col.IsA("AIPlayer")))
+//		%col.RBloodSimulate(%pos, vectorNormalize(%obj.getVelocity()), %this, %obj.getScale(), %dism);
 
 	//%col.damage(%obj, %pos, %damage, %type);
 	Parent::Damage(%this, %obj, %col, %fade, %pos, %normal);
