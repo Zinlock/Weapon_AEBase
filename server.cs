@@ -1887,7 +1887,7 @@ package MinimumDetonationRange //borrowed from rallypack directly, i take no cre
 		if(isObject(%this.activatedProjectile) && !%obj.rwep_dontActivate)
 		{
 			%initialPosition = %obj.getPosition();
-			%initialVelocity = vectorScale(%obj.getVelocity(), %this.activatedProjectile.muzzleVelocity);
+			%initialVelocity = vectorScale(vectorNormalize(%obj.getVelocity()), %this.activatedProjectile.muzzleVelocity);
 
 			%projectile = new Projectile ()
 			{
