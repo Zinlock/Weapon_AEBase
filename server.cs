@@ -92,9 +92,31 @@ $ae_HighScopeFOV = 8;
 $ae_MedScopeFOV = 16;
 $ae_LowScopeFOV = 24;
 
-$ae_RifleUPS = 760;
-$ae_SniperUPS = 1100;
-$ae_AntiMatUPS = 1600;
+$ae_RifleUPS = 500;
+$ae_SniperUPS = 1000;
+$ae_AntiMatUPS = 1500;
+
+$ae_falloffPistolStart = 48;
+$ae_falloffPistolEnd = 96;
+$ae_falloffPistol = 0.75;
+$ae_falloffPistolLongStart = 72;
+$ae_falloffPistolLongEnd = 96;
+$ae_falloffPistolLong = 0.75;
+$ae_falloffSMGStart = 96;
+$ae_falloffSMGEnd = 160;
+$ae_falloffSMG = 0.6;
+$ae_falloffRifleStart = 160;
+$ae_falloffRifleEnd = 256;
+$ae_falloffRifle = 0.6;
+$ae_falloffDMRStart = 256;
+$ae_falloffDMREnd = 512;
+$ae_falloffDMR = 0.7;
+$ae_falloffShotgunStart = 48;
+$ae_falloffShotgunEnd = 96;
+$ae_falloffShotgun = 0.5;
+$ae_falloffSniperStart = 96;
+$ae_falloffSniperEnd = 256;
+$ae_falloffSniper = 2;
 
 if(isFile("Add-Ons/Sound_Blockland/server.cs"))
 {
