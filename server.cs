@@ -111,9 +111,9 @@ $ae_falloffRifle = 0.6;
 $ae_falloffDMRStart = 256;
 $ae_falloffDMREnd = 512;
 $ae_falloffDMR = 0.7;
-$ae_falloffShotgunStart = 48;
+$ae_falloffShotgunStart = 32;
 $ae_falloffShotgunEnd = 96;
-$ae_falloffShotgun = 0.5;
+$ae_falloffShotgun = 0.25;
 $ae_falloffSniperStart = 96;
 $ae_falloffSniperEnd = 256;
 $ae_falloffSniper = 2;
@@ -1311,6 +1311,24 @@ function Player::AEFire(%obj,%this,%slot)
 			MissionCleanup.add(%p);
 		}
 	}
+	
+    if(%this.concBlastProj !$= "")
+	{
+			%p = new (%this.projectileType)()
+			{
+			dataBlock = ShotgunBlastProjectile;
+            directDamage = %this.concBlastDamage;
+            vehicleDamage = %vehicleMult;
+			initialVelocity = vectorScale(%obj.getMuzzleVector(0), 100);
+			initialPosition = %obj.getMuzzlePoint(%slot);
+			sourceObject = %obj;
+			sourceSlot = %slot;
+			client = %obj.client;
+			scale = %this.concBlastScale;
+		};
+			MissionCleanup.add(%p);
+	}
+	
 }
 
 function WeaponImage::AEOnHighClimb(%this, %obj, %slot)

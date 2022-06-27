@@ -676,6 +676,34 @@ function AETraillessProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 	AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal);
 }
 
+// shotgun concussion blast
+
+datablock ProjectileData(ShotgunBlastProjectile : AETrailedProjectile)
+{
+   projectileShapeName = "add-ons/Vehicle_Tank/tankbullet.dts";
+   particleEmitter = "";
+  
+   muzzleVelocity      = 100;
+   impactImpulse	     = 300;
+   verticalImpulse     = 100;
+
+   armingDelay         = 0;
+   lifetime            = 70;
+   fadeDelay           = 0;
+   isBallistic         = true;
+   gravityMod = 0.0;
+};
+
+function ShotgunBlastProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity)
+{
+	AETrailedProjectile::onCollision(%this, %obj, %col, %fade, %pos, %normal, %velocity);
+}
+
+function ShotgunBlastProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
+{
+	AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal);
+}
+
 // HITSCAN TRACER
 
 datablock StaticShapeData(BulletTrailStatic) { shapeFile = "./Hitscan/bullettrail.dts"; };
