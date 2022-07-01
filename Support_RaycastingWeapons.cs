@@ -1,6 +1,6 @@
 // not the raycasting weapons you're looking for
 
-function Player::fireRaycastProjectile(%pl, %img, %start, %dir)
+function ShapeBase::fireRaycastProjectile(%pl, %img, %start, %dir)
 {
 	if((%range = %img.staticTotalRange) $= "")
 		%range = 1000;

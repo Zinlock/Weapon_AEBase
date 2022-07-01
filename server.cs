@@ -248,14 +248,20 @@ function ae_calculateDamagePosition(%pl,%hitPos) // taken from swollow's code bu
 		return "upbody";
 }
 
+function ShapeBase::baadDisplayAmmo(%obj, %this)
+{
+	return;
+}
+
 function Player::baadDisplayAmmo(%obj, %this)
 {
 	if(isObject(%obj.client) && %obj.getClassName() $= "Player" && isObject(%this.item.AEType))
 	{
 		%type = %this.AEUseAmmo;
-		%ammo = %obj.AEAmmo[%obj.currTool, %type];
+		%ammo = %obj.AEAmmo[%obj.currTool, %type, 0];
 		%automode = %this.item.Auto;
 		%ammo_max = %this.item.AEAmmo[%type];
+
 		if(%this.item.AENoReserve[%type])
 			%ammo_name = %this.item.AEType[%type];
 		else
@@ -266,7 +272,7 @@ function Player::baadDisplayAmmo(%obj, %this)
 
 		%ammo_maxres = %this.item.AEType[%type].AEMax;
 
-		if($Pref::AEBase::ReserveAmmo && !%this.item.AENoReserve[%type])
+		if($Pref::AEBase::ReserveAmmo && !%this.item.AENoReserve[%type] && !%obj.AEInfReserve)
 			%ammo_mix = %ammo_reserve;
 		else
 			%ammo_mix = %ammo_max;
@@ -1016,10 +1022,10 @@ package WeaponDroping
 };
 ActivatePackage(WeaponDroping);
 
-function Player::AEFire(%obj,%this,%slot)
+function ShapeBase::AEFire(%obj,%this,%slot)
 {
 	if(%obj.getDamagePercent() >= 1)
-	return;
+		return;
 
 	%src = %obj.getMuzzlePoint(%slot);
 	%sfx = %this.farShotSound;
@@ -1036,9 +1042,9 @@ function Player::AEFire(%obj,%this,%slot)
 			%cc.play3D(%sfx, %src);
 	}
 
-	if(getSimTime()-%obj.lastShellSound > 800 || getRandom(0,1) == 0)
+	if(getSimTime()-%obj.lastShellSound[%slot] > 800 || getRandom(0,1) == 0)
 	{
-		%obj.lastShellSound = getSimTime();
+		%obj.lastShellSound[%slot] = getSimTime();
 		schedule(getRandom(%this.ShellSoundMin,%this.ShellSoundMax),0,serverPlay3D,%this.shellSound @ getRandom(1,3) @ Sound,%obj.getPosition());
 
 		if(vectorLen(%this.muzzleFlashScale) > 0 && $Pref::AEBase::muzzleFlash)
@@ -1057,21 +1063,21 @@ function Player::AEFire(%obj,%this,%slot)
 		}
 	}
 
-	if(getSimTime() - %obj.lastShotTime[%this] < %this.spreadReset)
+	if(getSimTime() - %obj.lastShotTime[%this, %slot] < %this.spreadReset)
 	{
-		%obj.burst[%this]++;
+		%obj.burst[%this, %slot]++;
 	}
 	else
 	{
-		%obj.burst[%this] = 1;
-		%obj.boundDir[%this] = getRandom(0, 1);
-		if(!%obj.boundDir[%this])
-			%obj.boundDir[%this] = -1;
+		%obj.burst[%this, %slot] = 1;
+		%obj.boundDir[%this, %slot] = getRandom(0, 1);
+		if(!%obj.boundDir[%this, %slot])
+			%obj.boundDir[%this, %slot] = -1;
 
-		%obj.dirFlip[%this] = getRandom(12, 20);
+		%obj.dirFlip[%this, %slot] = getRandom(12, 20);
 
-		%obj.climb[%this] = 0;
-		%obj.spray[%this] = 0;
+		%obj.climb[%this, %slot] = 0;
+		%obj.spray[%this, %slot] = 0;
 	}
 
 	%recx = %this.recoilWidth / 100;
@@ -1084,7 +1090,7 @@ function Player::AEFire(%obj,%this,%slot)
 	%spreadMin = %this.spreadMin;
 	%spreadMax = %this.spreadMax;
 
-	if (%obj.getClassName() $= "Player")
+	if (!%obj.IsA("AIPlayer"))
 		%spreadMult = (%this.gunType $= "Sniper" && !isObject(%this.sourceImage)) ? $Pref::AEBase::playerSniperHipfireSpreadMult : $Pref::AEBase::playerSpreadMult;
 	else
 		%spreadMult = (%this.gunType $= "Sniper" && !isObject(%this.sourceImage)) ? $Pref::AEBase::botSniperHipfireSpreadMult : $Pref::AEBase::botSpreadMult;
@@ -1094,7 +1100,7 @@ function Player::AEFire(%obj,%this,%slot)
 	%tag = %this.projectileTagStrength;
 	%tagRec = %this.projectileTagRecovery;
 
-	if(%obj.getClassName() $= "Player")
+	if(!%obj.IsA("AIPlayer"))
 	{
 		%recx *= $Pref::AEBase::playerRecoilMult;
 		%recz *= $Pref::AEBase::playerRecoilMult;
@@ -1131,9 +1137,9 @@ function Player::AEFire(%obj,%this,%slot)
 	for(%i = 0; %i < %this.projectileCount; %i++)
 	{
 		%vector = %obj.getMuzzleVector(0);
-		if(%obj.burst[%this] <= %grace)
+		if(%obj.burst[%this, %slot] <= %grace)
 		{
-			if(%obj.burst[%this] == 1)
+			if(%obj.burst[%this, %slot] == 1)
 			{
 				%spreadMin = %this.spreadBase;
 
@@ -1146,7 +1152,7 @@ function Player::AEFire(%obj,%this,%slot)
 		}
 		else
 		{
-			%spread = mFloatLerp(%spreadMax, %spreadMin, %obj.spray[%this]);
+			%spread = mFloatLerp(%spreadMax, %spreadMin, %obj.spray[%this, %slot]);
 
 			%spreadx = (%spread / %d) * (getRandom() - 0.5);
 			%spready = (%spread / %d) * (getRandom() - 0.5);
@@ -1154,7 +1160,7 @@ function Player::AEFire(%obj,%this,%slot)
 
 			if(%recz > 0)
 			{
-				%climb = (%obj.burst[%this] - %grace) * %recz;
+				%climb = (%obj.burst[%this, %slot] - %grace) * %recz;
 				%climb = mClampF(%climb, 0.0, %reczm);
 				%progress = 0 + %climb / %reczm * (1 - 0);
 				%climb += (%spreadz / 2);
@@ -1162,16 +1168,16 @@ function Player::AEFire(%obj,%this,%slot)
 			else
 				%climb = 0;
 
-			%obj.climb[%this] = %climb;
-			%obj.spray[%this] = %progress;
+			%obj.climb[%this, %slot] = %climb;
+			%obj.spray[%this, %slot] = %progress;
 
-			%bound = (%obj.burst[%this] - %grace) * %recx;
-			%bound = %bound * %obj.boundDir[%this];
+			%bound = (%obj.burst[%this, %slot] - %grace) * %recx;
+			%bound = %bound * %obj.boundDir[%this, %slot];
 
 			// I honestly don't even know how the fuck this works anymore
-			if(%obj.dirFlip[%this] <= %obj.burst[%this])
+			if(%obj.dirFlip[%this, %slot] <= %obj.burst[%this, %slot])
 			{
-				%bound = (%bound + (-%obj.boundDir[%this] * (%obj.burst[%this] - %obj.dirFlip[%this]) / (100 * 0.35)));
+				%bound = (%bound + (-%obj.boundDir[%this, %slot] * (%obj.burst[%this, %slot] - %obj.dirFlip[%this, %slot]) / (100 * 0.35)));
 			}
 
 			%bound = mClampF(%bound, -%recxm, %recxm);
@@ -1180,7 +1186,7 @@ function Player::AEFire(%obj,%this,%slot)
 			%vector = vectorNormalize(%vector);
 		}
 
-		%projType = (%obj.IsA("Player") ? $Pref::AEBase::projectilesAs : $Pref::AEBase::projectilesAsBot);
+		%projType = (!%obj.IsA("AIPlayer") ? $Pref::AEBase::projectilesAs : $Pref::AEBase::projectilesAsBot);
 
 		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan || %projType == 0 || %projType == 4)
 		{
@@ -1190,7 +1196,7 @@ function Player::AEFire(%obj,%this,%slot)
 			%headshotMult = %this.projectileHeadshotMult;
 			%vehicleMult = %this.projectileVehicleDamageMult;
 
-			if(%obj.getClassName() $= "Player")
+			if(!%obj.IsA("AIPlayer"))
 			{
 				if(%obj.AEDamageMult !$= "")
 					%directDamage *= %obj.AEDamageMult;
@@ -1271,7 +1277,7 @@ function Player::AEFire(%obj,%this,%slot)
 		}
 	}
 
-	%obj.lastShotTime[%this] = getSimTime();
+	%obj.lastShotTime[%this, %slot] = getSimTime();
 
 	%lclimb = %this.medClimbThreshold;
 	if(%lclimb $= "") %lclimb = 0.05;
@@ -1312,13 +1318,13 @@ function Player::AEFire(%obj,%this,%slot)
 		}
 	}
 	
-    if(%this.concBlastProj !$= "")
+	if(%this.concBlastProj !$= "")
 	{
-			%p = new (%this.projectileType)()
-			{
+		%p = new (%this.projectileType)()
+		{
 			dataBlock = ShotgunBlastProjectile;
-            directDamage = %this.concBlastDamage;
-            vehicleDamage = %vehicleMult;
+			directDamage = %this.concBlastDamage;
+			vehicleDamage = %vehicleMult;
 			initialVelocity = vectorScale(%obj.getMuzzleVector(0), 100);
 			initialPosition = %obj.getMuzzlePoint(%slot);
 			sourceObject = %obj;
@@ -1326,19 +1332,18 @@ function Player::AEFire(%obj,%this,%slot)
 			client = %obj.client;
 			scale = %this.concBlastScale;
 		};
-			MissionCleanup.add(%p);
+		MissionCleanup.add(%p);
 	}
-	
 }
 
 function WeaponImage::AEOnHighClimb(%this, %obj, %slot)
 {
-	%obj.playThread(2, jump);
+	%obj.aeplayThread(2, jump);
 }
 
 function WeaponImage::AEOnMedClimb(%this, %obj, %slot)
 {
-	%obj.playThread(2, plant);
+	%obj.aeplayThread(2, plant);
 }
 
 function WeaponImage::AEOnLowClimb(%this, %obj, %slot)
@@ -1360,8 +1365,13 @@ function WeaponImage::AELoadCheck(%this, %obj, %slot)
 function WeaponImage::AEOnFire(%this, %obj, %slot)
 {
 	%obj.AEFire(%this, %slot);
-	%obj.AEAmmo[%obj.currTool, %this.AEUseAmmo]--;
-	%obj.baadDisplayAmmo(%this);
+
+	if(!%obj.AEInfAmmo)
+		%obj.AEAmmo[%obj.currTool, %this.AEUseAmmo, %slot]--;
+
+	if(%obj.IsA("Player"))
+		%obj.baadDisplayAmmo(%this);
+	
 	%this.AEPreAmmoCheck(%obj, %slot);
 }
 
@@ -1369,12 +1379,14 @@ function WeaponImage::AEOnEmpty(%this, %obj, %slot)
 {
 	if(getSimTime() - %obj.reloadTime[%this.getID()] <= %this.stateTimeoutValue[0] * 1000 + 1000)
 		%obj.schedule(0, setImageAmmo, %slot, 1);
-	%obj.baadDisplayAmmo(%this);
+
+	if(%obj.IsA("Player"))
+		%obj.baadDisplayAmmo(%this);
 }
 
 function WeaponImage::AEOnEmptyA(%this, %obj, %slot)
 {
-    %obj.setImageAmmo(%slot, 1);
+  %obj.setImageAmmo(%slot, 1);
 }
 
 function WeaponImage::AEShotgunLoadCheck(%this, %obj, %slot)
@@ -1405,15 +1417,16 @@ function WeaponImage::AEUnmountCleanup(%this, %obj, %slot)
 	{
 		%obj.client.applyBodyParts();
 		if($Pref::AEBase::HUD != 11)
-		if($Pref::AEBase::HUDPos <= 2) 
-			%obj.client.bottomPrint("", 1, 1);
-		else
-			%obj.client.centerPrint("", 1);
-	}
-			
+		{
+			if($Pref::AEBase::HUDPos <= 2) 
+				%obj.client.bottomPrint("", 1, 1);
+			else
+				%obj.client.centerPrint("", 1);
+		}
+	}	
 
 	if(%obj.FireLoop)
-        %obj.playAudio(0, %this.loopingEndSound);
+    %obj.playAudio(0, %this.loopingEndSound);
 
 	cancel(%obj.aeLaser);
 
@@ -1429,9 +1442,9 @@ function WeaponImage::AEMountSetup(%this, %obj, %slot)
 	%itm = %obj.tool[%idx];
 	%type = %this.AEUseAmmo;
 
-	if(%obj.IsA("AIPlayer"))
+	if(!%obj.IsA("Player"))
 	{
-		%itm = %obj.getMountedImage(0).item;
+		%itm = %obj.getMountedImage(%slot).item;
 		%idx = "";
 
 		if(!isObject(%obj.aeLastItem) || %obj.aeLastItem != %itm)
@@ -1440,55 +1453,69 @@ function WeaponImage::AEMountSetup(%this, %obj, %slot)
 		}
 	}
 
-	if(%obj.aeAmmo[%idx, %type] > %itm.aeAmmo[%type])
-		%obj.aeAmmo[%idx, %type] = %itm.aeAmmo[%type];
-	else if(%obj.aeAmmo[%idx, %type] < 0)
-		%obj.aeAmmo[%idx, %type] = 0;
-	else if(%obj.aeAmmo[%idx, %type] $= "")
-		%obj.aeAmmo[%idx, %type] = %itm.aeAmmo[%type];
+	if(%obj.aeAmmo[%idx, %type, %slot] > %itm.aeAmmo[%type])
+		%obj.aeAmmo[%idx, %type, %slot] = %itm.aeAmmo[%type];
+	else if(%obj.aeAmmo[%idx, %type, %slot] < 0)
+		%obj.aeAmmo[%idx, %type, %slot] = 0;
+	else if(%obj.aeAmmo[%idx, %type, %slot] $= "")
+		%obj.aeAmmo[%idx, %type, %slot] = %itm.aeAmmo[%type];
 
 	%obj.aeLastItem[%idx] = %itm;
 
-	%obj.hideHands(%this);
 	%obj.baadDisplayAmmo(%this);
 	%obj.aeLaserLoop(%this);
 
-	%obj.aeUpdateSpeed();
-
-  %obj.FireLoop = false;
-
-	if(isObject(%cl = %obj.client))
+	if(%obj.IsA("Player") || %obj.IsA("AIPlayer"))
 	{
-		%cl.aeFovCheck(%this);
-		if(!%cl.aeHelpNotified)
-		{
-			messageClient(%cl, '', "\c5Hey, you can use /aeHelp to see all the commands you can use.");
+		%obj.hideHands(%this);
+		%obj.aeUpdateSpeed();
 
-			if((%val = $AEClient_ADSHold[%cl.getBLID()]) !$= "")
-				%cl.adsHold = %val;
-				
-			if((%val = $AEClient_NoZoom[%cl.getBLID()]) !$= "")
-				%cl.zoomLerp = %val;
-				
-			%cl.aeHelpNotified = true;
+		if(isObject(%cl = %obj.client))
+		{
+			%cl.aeFovCheck(%this);
+			if(!%cl.aeHelpNotified)
+			{
+				messageClient(%cl, '', "\c5Hey, you can use /aeHelp to see all the commands you can use.");
+
+				if((%val = $AEClient_ADSHold[%cl.getBLID()]) !$= "")
+					%cl.adsHold = %val;
+					
+				if((%val = $AEClient_NoZoom[%cl.getBLID()]) !$= "")
+					%cl.zoomLerp = %val;
+					
+				%cl.aeHelpNotified = true;
+			}
 		}
 	}
+
+  %obj.FireLoop = false;
 }
 
 function WeaponImage::AEShotgunLoadOne(%this, %obj, %slot)
 {
-	%obj.AEShellReload();
-	%obj.baadDisplayAmmo(%this);
+	%obj.AEShellReload(%slot);
+
+	if(%obj.IsA("Player"))
+		%obj.baadDisplayAmmo(%this);
+
 	%this.AEPreMagCheck(%obj, %slot);
 	%this.AEPreLoadAmmoReserveCheck(%obj, %slot);
 }
 
 function WeaponImage::AEMagReloadAll(%this, %obj, %slot)
 {
-	%obj.AEMagReload();
-	%obj.baadDisplayAmmo(%this);
+	%obj.AEMagReload(%slot);
+
+	if(%obj.IsA("Player"))
+		%obj.baadDisplayAmmo(%this);
+		
 	%this.AEPreAmmoCheck(%obj, %slot);
 	%this.AEPreLoadAmmoReserveCheck(%obj, %slot);
+}
+
+function ShapeBase::getHackPosition(%obj)
+{
+	return %obj.getPosition();
 }
 
 // should probably move all this laser related stuff elsewhere
@@ -1572,11 +1599,10 @@ function Normal2Rotation(%normal)
 	%initialAngle = mACos(vectorDot(%normal, "0 0 1"));
 	%rotation = %rotAxis SPC mRadtoDeg(%initialAngle);
 
-
 	return %rotation;
 }
 
-function Player::aeLaserLoop(%pl, %img)
+function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 {
 	if(!isObject(%pl) || !isObject(%img))
 		return;
@@ -1597,7 +1623,7 @@ function Player::aeLaserLoop(%pl, %img)
 	// 	}
 	// }
 
-	if((getWordCount(%off) <= 0 || !hasItemOnList(%off, %pl.getImageState(0))) && (!%pl.Client.attachOff || %img.ignoreAToggle))
+	if((getWordCount(%off) <= 0 || !hasItemOnList(%off, %pl.getImageState(%slot))) && (!%pl.Client.attachOff || %img.ignoreAToggle))
 	{
 		//1 if(!isObject(%cl = %pl.Client) || %cl.aeLaserColor $= "")
 		// 	%cl.aeLaserColor = "1 0 0 1";
@@ -1607,12 +1633,12 @@ function Player::aeLaserLoop(%pl, %img)
 
 		if(%img.laserDistance > 1 || %img.flashlightDistance > 1)
 		{
-			%vec = %pl.getMuzzleVector(0);
+			%vec = %pl.getMuzzleVector(%slot);
 
-			if(getSimTime() - %pl.lastShotTime[%img] < %img.spreadReset)
-				%vec = vectorAdd(%vec, "0 0 " @ %pl.climb[%img]);
+			if(getSimTime() - %pl.lastShotTime[%img, %slot] < %img.spreadReset)
+				%vec = vectorAdd(%vec, "0 0 " @ %pl.climb[%img, %slot]);
 
-			%pos = %pl.getMuzzlePoint(0);
+			%pos = %pl.getMuzzlePoint(%slot);
 			%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType;
 
 			if(%img.laserDistance > 1)
@@ -1639,26 +1665,26 @@ function Player::aeLaserLoop(%pl, %img)
 						}
 					}
 
-					cancel(%pl.aeLaserCleanup);
+					cancel(%pl.aeLaserCleanup[%slot]);
 
-					if(!isObject(%pl.laserDot))
+					if(!isObject(%pl.laserDot[%slot]))
 					{
-						%pl.laserDot = new StaticShape()
+						%pl.laserDot[%slot] = new StaticShape()
 						{
 							dataBlock = AELaserDotShape;
 						};
 
-						%pl.laserDot.setNodeColor("ALL", %img.laserColor);
+						%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
 
-						%pl.laserDot.startFade(1,0,1);
+						%pl.laserDot[%slot].startFade(1,0,1);
 
 						%sx = mClampF(getWord(%img.laserSize, 0), 0.2, 6);
 						%sy = mClampF(getWord(%img.laserSize, 1), 0.2, 6);
 						%sz = mClampF(getWord(%img.laserSize, 2), 0.2, 6);
 
-						%pl.laserDot.setScale(%sx SPC %sy SPC %sz);
+						%pl.laserDot[%slot].setScale(%sx SPC %sy SPC %sz);
 
-						missionCleanup.add(%pl.laserDot);
+						missionCleanup.add(%pl.laserDot[%slot]);
 					}
 
 					if(%img.laserFade !$= "" && %img.laserFade < %img.laserDistance)
@@ -1669,20 +1695,20 @@ function Player::aeLaserLoop(%pl, %img)
 							%mult = (%dist - %img.laserFade) / (%img.laserDistance - %img.laserFade);
 							%alpha = mFloatLerp(%alpha, 0, 1 - %mult);
 
-							%pl.laserDot.setNodeColor("ALL", getWords(%img.laserColor, 0, 2) SPC %alpha);
+							%pl.laserDot[%slot].setNodeColor("ALL", getWords(%img.laserColor, 0, 2) SPC %alpha);
 						}
 						else
 						{
-							%pl.laserDot.setNodeColor("ALL", %img.laserColor);
+							%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
 						}
 					}
 
 					%rot = Normal2Rotation(%norm);
 					%ang = mDegToRad(getWord(%rot, 3));
 
-					%pl.laserDot.setTransform(%point SPC getWords(%rot, 0, 2) SPC %ang);
+					%pl.laserDot[%slot].setTransform(%point SPC getWords(%rot, 0, 2) SPC %ang);
 
-					%pl.aeLaserCleanup = %pl.laserDot.schedule(100, delete);
+					%pl.aeLaserCleanup[%slot] = %pl.laserDot[%slot].schedule(100, delete);
 				}
 			}
 
@@ -1714,11 +1740,11 @@ function Player::aeLaserLoop(%pl, %img)
 				else
 					%point = %end;
 
-				cancel(%pl.aeLightCleanup);
+				cancel(%pl.aeLightCleanup[%slot]);
 
-				if(!isObject(%pl.aeFlashLight))
+				if(!isObject(%pl.aeFlashLight[%slot]))
 				{
-					%pl.aeFlashLight = new FxLight()
+					%pl.aeFlashLight[%slot] = new FxLight()
 					{
 						datablock = AEPlayerFlashlight;
 						player = %player;
@@ -1728,15 +1754,15 @@ function Player::aeLaserLoop(%pl, %img)
 					};
 				}
 
-				%pl.aeFlashLight.setTransform(%point);
-				%pl.aeFlashLight.reset();
+				%pl.aeFlashLight[%slot].setTransform(%point);
+				%pl.aeFlashLight[%slot].reset();
 
-				%pl.aeLightCleanup = %pl.aeFlashLight.schedule(100, delete);
+				%pl.aeLightCleanup[%slot] = %pl.aeFlashLight[%slot].schedule(100, delete);
 			}
 		}
 	}
 
-	%pl.aeLaser = %pl.schedule(50, aeLaserLoop, %img);
+	%pl.aeLaser = %pl.schedule(50, aeLaserLoop, %img, %slot);
 }
 
 function strMultiline(%str, %len)
@@ -2064,10 +2090,13 @@ else
 // exec("./Weapon_BLShotgun.cs");
 }
 
-function Player::aeplayThread(%this, %slot, %thread)
+function ShapeBase::aeplayThread(%this, %slot, %thread)
 {
-	if(%this.getDamagePercent() < 1)
-	%this.playThread(%slot, %thread);
+	if(%this.IsA("Player") || %this.IsA("AIPlayer"))
+	{
+		if(%this.getDamagePercent() < 1)
+			%this.playThread(%slot, %thread);
+	}
 }
 
 function GameConnection::stateHelp(%cl) // for dev

@@ -1,8 +1,6 @@
-// Repurposed code from Oxy's pretty much scrapped BKT2 pack
-
-function Player::aeAmmoCheck(%pl)
+function ShapeBase::aeAmmoCheck(%pl, %slot)
 {
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -38,20 +36,17 @@ function Player::aeAmmoCheck(%pl)
 		return 0;
 	}
 
-	if(%pl.aeAmmo[%idx, %aIdx] >= %itm.aeAmmo[%aIdx])
+	if(%pl.aeAmmo[%idx, %aIdx, %slot] >= %itm.aeAmmo[%aIdx])
 		return 2; // full
-	else if(%pl.aeAmmo[%idx, %aIdx] > 0)
+	else if(%pl.aeAmmo[%idx, %aIdx, %slot] > 0)
 		return 1; // loaded
 	else
 		return 0; // empty
 }
 
-function Player::AEReserveCheck(%pl)
+function ShapeBase::AEReserveCheck(%pl, %slot)
 {
-	if(%pl.IsA("AIPlayer"))
-		return 2;
-
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -78,10 +73,10 @@ function Player::AEReserveCheck(%pl)
 		return;
 	}
 
-	if(%pl.aeAmmo[%idx, %aIdx] $= "")
-		%pl.aeAmmo[%idx, %aIdx] = %itm.aeAmmo[%aIdx];
+	if(%pl.aeAmmo[%idx, %aIdx, %slot] $= "")
+		%pl.aeAmmo[%idx, %aIdx, %slot] = %itm.aeAmmo[%aIdx];
 
-	if($Pref::AEBase::ReserveAmmo && !%itm.AENoReserve[%aIdx])
+	if($Pref::AEBase::ReserveAmmo && !%itm.AENoReserve[%aIdx] && !%pl.AEInfReserve)
 	{
 		if(%pl.AEReserve[%type] >= %itm.aeAmmo[%aIdx])
 			return 2; // full
@@ -94,9 +89,9 @@ function Player::AEReserveCheck(%pl)
 		return 2;
 }
 
-function Player::AEMagReload(%pl)
+function ShapeBase::AEMagReload(%pl, %slot)
 {
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -123,19 +118,19 @@ function Player::AEMagReload(%pl)
 		return;
 	}
 
-	if($Pref::AEBase::ReserveAmmo && !%pl.IsA("AIPlayer") && !%itm.AENoReserve[%aIdx])
+	if($Pref::AEBase::ReserveAmmo && !%pl.AEInfReserve && !%itm.AENoReserve[%aIdx])
 	{
 		if(%pl.AEReserve[%type] > %itm.aeAmmo[%aIdx])
 		{
-			%pl.AEReserve[%type] -= %itm.aeAmmo[%aIdx] - %pl.aeAmmo[%idx, %aIdx];
-			%pl.aeAmmo[%idx, %aIdx] = %itm.aeAmmo[%aIdx];
+			%pl.AEReserve[%type] -= %itm.aeAmmo[%aIdx] - %pl.aeAmmo[%idx, %aIdx, %slot];
+			%pl.aeAmmo[%idx, %aIdx, %slot] = %itm.aeAmmo[%aIdx];
 			return 2;
 		}
 		else if(%pl.AEReserve[%type] > 0)
 		{
-			%amt = %itm.aeAmmo[%aIdx] - %pl.AEAmmo[%idx, %aIdx];
+			%amt = %itm.aeAmmo[%aIdx] - %pl.AEAmmo[%idx, %aIdx, %slot];
 			%amt = mClamp(%amt, 0, %pl.AEReserve[%type]);
-			%pl.aeAmmo[%idx, %aIdx] += %amt;
+			%pl.aeAmmo[%idx, %aIdx, %slot] += %amt;
 			%pl.AEReserve[%type] -= %amt;
 			return 1;
 		}
@@ -144,14 +139,14 @@ function Player::AEMagReload(%pl)
 	}
 	else
 	{
-		%pl.aeAmmo[%idx, %aIdx] = %itm.aeAmmo[%aIdx];
+		%pl.aeAmmo[%idx, %aIdx, %slot] = %itm.aeAmmo[%aIdx];
 		return 2;
 	}
 }
 
-function Player::AEUnloadMag(%pl)
+function ShapeBase::AEUnloadMag(%pl, %slot)
 {
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -178,15 +173,15 @@ function Player::AEUnloadMag(%pl)
 		return;
 	}
 
-	if(%pl.aeAmmo[%idx, %aIdx] <= 0)
+	if(%pl.aeAmmo[%idx, %aIdx, %slot] <= 0)
 		return 0;
 
-	if($Pref::AEBase::ReserveAmmo && !%pl.IsA("AIPlayer") && !%itm.AENoReserve[%aIdx])
+	if($Pref::AEBase::ReserveAmmo && !%pl.AEInfReserve && !%itm.AENoReserve[%aIdx])
 	{
-		%ammo = %pl.aeAmmo[%idx, %aIdx];
+		%ammo = %pl.aeAmmo[%idx, %aIdx, %slot];
 		%final = %pl.aeReserve[%type] + %ammo;
 
-		if(%final > %type.aeMax)
+		if(%final > %type.aeMax && %pl.IsA("Player"))
 		{
 			%amt = %final - %type.aeMax;
 			
@@ -217,13 +212,13 @@ function Player::AEUnloadMag(%pl)
 			%pl.aeReserve[%type] = %final;
 	}
 
-	%pl.aeAmmo[%idx, %aIdx] = 0;
+	%pl.aeAmmo[%idx, %aIdx, %slot] = 0;
 	return 1;
 }
 
-function Player::AEUnloadShell(%pl)
+function ShapeBase::AEUnloadShell(%pl, %slot)
 {
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -250,10 +245,10 @@ function Player::AEUnloadShell(%pl)
 		return;
 	}
 
-	if(%pl.aeAmmo[%idx, %aIdx] <= 0)
+	if(%pl.aeAmmo[%idx, %aIdx, %slot] <= 0)
 		return 0;
 
-	if($Pref::AEBase::ReserveAmmo && !%pl.IsA("AIPlayer") && !%itm.AENoReserve[%aIdx])
+	if($Pref::AEBase::ReserveAmmo && !%pl.AEInfReserve && !%itm.AENoReserve[%aIdx])
 	{
 		%final = %pl.aeReserve[%type] + 1;
 
@@ -286,13 +281,13 @@ function Player::AEUnloadShell(%pl)
 			%pl.aeReserve[%type] = %final;
 	}
 
-	%pl.aeAmmo[%idx, %aIdx] -= 1;
+	%pl.aeAmmo[%idx, %aIdx, %slot] -= 1;
 	return 1;
 }
 
-function Player::AEShellReload(%pl)
+function ShapeBase::AEShellReload(%pl, %slot)
 {
-	%img = %pl.getMountedImage(0);
+	%img = %pl.getMountedImage(%slot);
 	%itm = %img.item;
 	%idx = %pl.currTool;
 
@@ -319,13 +314,13 @@ function Player::AEShellReload(%pl)
 		return;
 	}
 
-	if($Pref::AEBase::ReserveAmmo && !%pl.IsA("AIPlayer") && !%itm.AENoReserve[%aIdx])
+	if($Pref::AEBase::ReserveAmmo && !%pl.AEInfReserve && !%itm.AENoReserve[%aIdx])
 	{
 		if(%pl.AEReserve[%type] > 0)
 		{
 			%pl.AEReserve[%type]--;
-			%pl.aeAmmo[%idx, %aIdx]++;
-			if(%pl.aeAmmo[%idx, %aIdx] >= %itm.aeAmmo[%aIdx])
+			%pl.aeAmmo[%idx, %aIdx, %slot]++;
+			if(%pl.aeAmmo[%idx, %aIdx, %slot] >= %itm.aeAmmo[%aIdx])
 				return 2;
 			else
 				return 1;
@@ -335,10 +330,10 @@ function Player::AEShellReload(%pl)
 	}
 	else
 	{
-		if(%pl.aeAmmo[%idx, %aIdx] < %itm.aeAmmo[%aIdx])
-			%pl.aeAmmo[%idx, %aIdx]++;
+		if(%pl.aeAmmo[%idx, %aIdx, %slot] < %itm.aeAmmo[%aIdx])
+			%pl.aeAmmo[%idx, %aIdx, %slot]++;
 
-		if(%pl.aeAmmo[%idx, %aIdx] >= %itm.aeAmmo[%aIdx])
+		if(%pl.aeAmmo[%idx, %aIdx, %slot] >= %itm.aeAmmo[%aIdx])
 			return 2;
 		else
 			return 1;
@@ -347,43 +342,43 @@ function Player::AEShellReload(%pl)
 
 function WeaponImage::AEPreMagCheck(%img, %pl, %slot)
 {
-	%pl.setImageAmmo(%slot, %pl.aeAmmoCheck() == 2);
+	%pl.setImageAmmo(%slot, %pl.aeAmmoCheck(%slot) == 2);
 }
 
 function WeaponImage::AEPreMagAmmoCheck(%img, %pl, %slot)
 {
-	if(%pl.AEReserveCheck() > 0)
-		%pl.setImageAmmo(%slot, %pl.aeAmmoCheck() == 2);
+	if(%pl.AEReserveCheck(%slot) > 0)
+		%pl.setImageAmmo(%slot, %pl.aeAmmoCheck(%slot) == 2);
 	else
-		%pl.setImageAmmo(%slot, %pl.aeAmmoCheck());
+		%pl.setImageAmmo(%slot, %pl.aeAmmoCheck(%slot));
 }
 
 function WeaponImage::AEPreAmmoCheck(%img, %pl, %slot)
 {
-	%pl.setImageAmmo(%slot, %pl.aeAmmoCheck());
+	%pl.setImageAmmo(%slot, %pl.aeAmmoCheck(%slot));
 }
 
 function WeaponImage::AEPreLoadAmmoCheck(%img, %pl, %slot)
 {
-	%pl.setImageLoaded(%slot, %pl.aeAmmoCheck());
+	%pl.setImageLoaded(%slot, %pl.aeAmmoCheck(%slot));
 }
 
 function WeaponImage::AEPreReserveCheck(%img, %pl, %slot)
 {
-	%pl.setImageAmmo(%slot, %pl.AEReserveCheck());
+	%pl.setImageAmmo(%slot, %pl.AEReserveCheck(%slot));
 }
 
 function WeaponImage::AEPreLoadReserveCheck(%img, %pl, %slot)
 {
-	%pl.setImageLoaded(%slot, %pl.AEReserveCheck());
+	%pl.setImageLoaded(%slot, %pl.AEReserveCheck(%slot));
 }
 
 function WeaponImage::AEPreLoadAmmoReserveCheck(%img, %pl, %slot)
 {
-	%res = %pl.AEReserveCheck();
+	%res = %pl.AEReserveCheck(%slot);
 	%pl.setImageLoaded(%slot, %res);
 	if(!%res)
-		%pl.setImageLoaded(%slot, %pl.aeAmmoCheck());
+		%pl.setImageLoaded(%slot, %pl.aeAmmoCheck(%slot));
 }
 
 function strJaroDistance(%s1, %s2)
@@ -695,21 +690,83 @@ function serverCmdDropAmmo(%cl, %a0, %a1, %a2, %a3, %a4, %a5, %a6, %a7) // TODO:
 	messageClient(%cl, '', '\c2You dropped %1 "%2" ammo', %amt, %uiName);
 }
 
+function Player::AENotifyAmmo(%pl, %amt, %type)
+{
+	if(%amt <= 0)
+		return;
+
+	if($Pref::AEBase::ammosound && getSimTime() - %pl.lastPickupSound > 100)
+	{
+		serverPlay3D(AEAmmoPickupSound, %pl.getPosition());
+		%pl.lastPickupSound = getSimTime();
+	}
+
+	if(isObject(%img = %pl.getMountedImage(0)) && %img.item.aebase)
+		%pl.baadDisplayAmmo(%img);
+
+	if(!isObject(%cl = %pl.Client) || !isObject(%type) || %type.AEAmmo $= "ALL")
+		return;
+
+	if($Pref::AEBase::ammomessage)
+		messageClient(%cl, '', "<font:arial bold:14><color:f8fc03>+" @ %amt SPC %type.aeAmmo @ " ammo");
+}
+
+function Player::AEDumpAmmo(%pl)
+{
+	if(!$Pref::AEBase::AmmoDeathDrop)
+		return;
+
+	for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
+	{
+		%type = aeAmmoSet.getObject(%i);
+
+		if((%amt = %pl.AEReserve[%type]) !$= "" && %type.aeAmmo !$= "ALL")
+		{
+			if(%amt <= 0)
+				continue;
+
+			%itm = new Item()
+			{
+				dataBlock = %type;
+				position = %pl.getHackPosition();
+				canPickup = true;
+				static = false;
+				minigame = getMinigameFromObject(%pl);
+				bl_id = (isObject(%cl = %pl.Client) ? %cl.getBLID() : -1);
+			};
+
+			%itm.setCollisionTimeout(%pl);
+			%itm.setVelocity(getRandom(-6, 6) SPC getRandom(-6, 6) SPC getRandom(-6, 6));
+			%itm.schedulePop();
+			%itm.aeAmmo = %amt;
+
+			MissionCleanup.add(%itm);
+
+			%pl.AEReserve[%type] = 0;
+		}
+	}
+}
+
+function ShapeBase::AEReloadWeapon(%pl, %slot)
+{
+	if(%pl.getImageState(%slot) $= "Ready" || %pl.getImageState(%slot) $= "Smoke" || %pl.getImageState(%slot) $= "Activate")
+		%pl.setImageAmmo(%slot,0);
+	else if(%pl.getImageState(%slot) $= "Empty" || %pl.getImageState(%slot) $= "Dryfire")
+	{
+		%pl.setImageAmmo(%slot,1);
+		%pl.setImageLoaded(%slot,1);
+	}
+}
+
 package aeAmmo
 {
 	function serverCmdLight(%cl)
 	{
 		if(isObject(%pl = %cl.player) && isObject(%img = %pl.getMountedImage(0)) && %img.item.AEBase)
 		{
-			if(%pl.aeAmmoCheck() < 2 && %pl.AEReserveCheck() > 0)
+			if(%pl.aeAmmoCheck(0) < 2 && %pl.AEReserveCheck(0) > 0)
 			{
-				if(%pl.getImageState(0) $= "Ready" || %pl.getImageState(0) $= "Smoke" || %pl.getImageState(0) $= "Activate")
-					%pl.setImageAmmo(0,0);
-				else if(%pl.getImageState(0) $= "Empty" || %pl.getImageState(0) $= "Dryfire")
-				{
-					%pl.setImageAmmo(0,1);
-					%pl.setImageLoaded(0,1);
-				}
+				%pl.AEReloadWeapon(0);
 
 				return;
 			}
@@ -725,8 +782,11 @@ package aeAmmo
 		if(!isObject(aeAmmoSet))
 			AEMakeAmmo();
 
-		if(isObject(%pl) && %pl.getClassName() !$= "AIPlayer") // TODO!!: let AI players spawn with ammo - this is temporary to fix mag drops causing ammo to spawn on the player
+		if(isObject(%pl))
 		{
+			if(%pl.IsA("AIPlayer"))
+				%pl.AEInfReserve = true;
+			
 			for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
 			{
 				%type = aeAmmoSet.getObject(%i);
@@ -749,20 +809,23 @@ package aeAmmo
 		if(isObject(%pl = %cl.player) && isObject(%pl.tool[%slot]))
 		{
 			%itm = %pl.tool[%slot].getid();
-			
-			if(%pl.aeAmmo[%slot, ""] !$= "")
-			{
-				$weaponAmmoTemp[%itm] = %pl.aeAmmo[%slot, ""];
-				%pl.aeAmmo[%slot, ""] = "";
-			}
 
-			for(%i = 0; %i < getWordCount(%itm.AEAmmoTypes); %i++)
+			for(%i = 0; %i < 4; %i++)
 			{
-				%type = getWord(%itm.AEAmmoTypes, %i);
-				if(%pl.AEAmmo[%slot, %type] !$= "")
+				if(%pl.aeAmmo[%slot, "", %i] !$= "")
 				{
-					$weaponAmmoTemp[%itm, %type] = %pl.AEAmmo[%slot, %type];
-					%pl.AEAmmo[%slot, %type] = "";
+					$weaponAmmoTemp[%itm, "", %i] = %pl.aeAmmo[%slot, "", %i];
+					%pl.aeAmmo[%slot, "", %i] = "";
+				}
+
+				for(%w = 0; %w < getWordCount(%itm.AEAmmoTypes); %w++)
+				{
+					%type = getWord(%itm.AEAmmoTypes, %w);
+					if(%pl.AEAmmo[%slot, %type, %i] !$= "")
+					{
+						$weaponAmmoTemp[%itm, %type, %i] = %pl.AEAmmo[%slot, %type, %i];
+						%pl.AEAmmo[%slot, %type, %i] = "";
+					}
 				}
 			}
 		}
@@ -774,44 +837,50 @@ package aeAmmo
 	{
 		Parent::onAdd(%this, %obj);
 
-		%uiName = strreplace(%this.uiName, "A: ", "");
-		%amt = %this.AERefill;
-		
 		if(%this.AEIsAmmo)
 		{
 			if($Pref::AEBase::ammoitemspin)
 				%obj.rotate = true;
 			
+			%uiName = strreplace(%this.uiName, "A: ", "");
+			%amt = %this.AERefill;
+
 			%obj.setShapeNameDistance(15);
 
 			if(%this.AEAmmo !$= "ALL")
 				%obj.setShapeName(%uiName SPC "(" @ %amt @ ")");    
 			else
-				%obj.setShapeName(%uiName SPC "(ALL)");    
-		}
+				%obj.setShapeName(%uiName SPC "(ALL)");
 
-		if($weaponAmmoTemp[%this] !$= "")
-		{
-			%obj.aeAmmo = $weaponAmmoTemp[%this];
-			$weaponAmmoTemp[%this] = "";
+			if(%this.AERefill > 0)
+				%obj.aeAmmo = %this.AERefill;
 		}
-		else if(!%this.AEIsAmmo && %this.aeAmmo > 0)
-			%obj.aeAmmo = %this.aeAmmo;
-		else if(%this.AERefill > 0)
-			%obj.aeAmmo = %this.AERefill;
-
-		for(%i = 0; %i < getWordCount(%this.AEAmmoTypes); %i++)
+		else
 		{
-			%type = getWord(%this.AEAmmoTypes, %i);
-			if($weaponAmmoTemp[%this, %type] !$= "")
+			if(%this.aeAmmo > 0)
+				%obj.aeAmmo["", 0] = %this.aeAmmo;
+			
+			if(%this.aeAmmo[%type] > 0)
+				%obj.aeAmmo[%type, 0] = %this.aeAmmo[%type];
+			
+			for(%i = 0; %i < 4; %i++)
 			{
-				%obj.aeAmmo[%type] = $weaponAmmoTemp[%this, %type];
-				$weaponAmmoTemp[%this, %type] = "";
+				if($weaponAmmoTemp[%this, "", %i] !$= "")
+				{
+					%obj.aeAmmo["", %i] = $weaponAmmoTemp[%this, "", %i];
+					$weaponAmmoTemp[%this, "", %i] = "";
+				}
+
+				for(%w = 0; %w < getWordCount(%this.AEAmmoTypes); %w++)
+				{
+					%type = getWord(%this.AEAmmoTypes, %w);
+					if($weaponAmmoTemp[%this, %type, %i] !$= "")
+					{
+						%obj.aeAmmo[%type, %i] = $weaponAmmoTemp[%this, %type, %i];
+						$weaponAmmoTemp[%this, %type, %i] = "";
+					}
+				}
 			}
-			else if(!%this.AEIsAmmo && %this.aeAmmo[%type] > 0)
-				%obj.aeAmmo[%type] = %this.aeAmmo[%type];
-			else if(%this.AERefill > 0)
-				%obj.aeAmmo[%type] = %this.AERefill[%type];
 		}
 
 		%obj.types = %this.AEAmmoTypes;
@@ -890,40 +959,47 @@ package aeAmmo
 			}
 		}
 
-		%ammo = %item.aeAmmo;
 		%types = %item.types;
-		for(%i = 0; %i < getWordCount(%types); %i++)
+		for(%s = 0; %s < 4; %s++)
 		{
-			%type = getWord(%types, %i);
-			$ammoTemp[%type] = %item.aeAmmo[%type];
+			%ammo["", %s] = %item.aeAmmo["", %s];
+			for(%i = 0; %i < getWordCount(%types); %i++)
+			{
+				%type = getWord(%types, %i);
+				%ammo[%type, %s] = %item.aeAmmo[%type, %s];
+			}
 		}
 
 		%p = Parent::Pickup(%pl, %item);
 
 		%db2 = %pl.getDatablock();
 
+		%break = 0;
+
 		if(%db.AEBase && !%db.AEIsAmmo)
 		{
-			if(%ammo !$= "")
+			for(%i = 0; %i < %db2.maxTools; %i++)
 			{
-				for(%i = 0; %i < %db2.maxTools; %i++)
+				for(%s = 0; %s < 4; %s++)
 				{
 					for(%w = 0; %w < getWordCount(%types); %w++)
 					{
 						%type = getWord(%types, %w);
-						if(isObject(%pl.tool[%i].aeAmmo[%type]) && %pl.aeAmmo[%i, %type] $= "" && $ammoTemp[%type] !$= "")
-						{
-							%pl.aeAmmo[%i, %type] = $ammoTemp[%type];
-							$ammoTemp[%type] = "";
-						}
+						if(isObject(%pl.tool[%i].aeAmmo[%type]) && %pl.aeAmmo[%i, %type, %s] $= "" && %ammo[%type, %s] !$= "")
+							%pl.aeAmmo[%i, %type, %s] = %ammo[%type, %s];
 					}
 
-					if(NameToID(%pl.tool[%i].AEType) == NameToID(%db.AEType) && %pl.aeAmmo[%i, ""] $= "")
+					if(NameToID(%pl.tool[%i].AEType) == NameToID(%db.AEType) && %pl.aeAmmo[%i, "", %s] $= "")
 					{
-						%pl.aeAmmo[%i, ""] = %ammo;
-						break;
+						if(%ammo["", %s] !$= "")
+							%pl.aeAmmo[%i, "", %s] = %ammo["", %s];
+						
+						%break = 1;
 					}
 				}
+
+				if(%break)
+					break;
 			}
 		}
 
@@ -935,7 +1011,7 @@ package aeAmmo
 		%db2 = %item.getDatablock();
 		if($Pref::AEBase::ReserveAmmo)
 		{
-			if(%item.aeAmmo !$= "" && %item.canPickup && %pl.getDamagePercent() < 1.0 && minigameCanUse(%pl, %item) && !%pl.isBody && !%pl.isCorpse)
+			if(%item.aeAmmo["", 0] !$= "" && %item.canPickup && %pl.getDamagePercent() < 1.0 && minigameCanUse(%pl, %item) && !%pl.isBody && !%pl.isCorpse)
 			{
 				if(!%db2.AEIsAmmo)
 				{
@@ -943,45 +1019,48 @@ package aeAmmo
 					{
 						if(%pl.tool[%i] == %db2.getID() && %pl.tool[%i].AEType.getID() == %db2.AEType.getID())
 						{
-							if(%item.aeAmmo > 0)
+							for(%s = 0; %s < 4; %s++)
 							{
-								%res = false;
-								for(%w = 0; %w <= getWordCount(%item.types); %w++)
+								if(%item.aeAmmo["", %s] > 0)
 								{
-									%aidx = "";
-
-									if(%w != getWordCount(%item.types))
-										%aidx = getWord(%item.types, %w);
-
-									%type = %db2.AEType[%aidx];
-
-									if(%db2.AENoReserve[%aidx])
-										continue;
-
-									if(%pl.AEReserve[%type] + %item.aeAmmo[%aidx] <= %type.AEMax)
+									%res = false;
+									for(%w = 0; %w <= getWordCount(%item.types); %w++)
 									{
-										%res = true;
-										%pl.AEReserve[%type] += %item.aeAmmo[%aidx];
-										%pl.AENotifyAmmo(%item.aeAmmo[%aidx], %type);
-										if(!isObject(%item.spawnBrick) && !%item.static)
-											%item.aeAmmo[%aidx] = 0;
-									}
-									else if(%pl.AEReserve[%type] < %type.AEMax)
-									{
-										%res = true;
-										%amt = %type.AEMax - %pl.AEReserve[%type];
-										%pl.AEReserve[%type] += %amt;
+										%aidx = "";
 
-										%pl.AENotifyAmmo(%amt, %type);
-										if(!isObject(%item.spawnBrick) && !%item.static)
-											%item.aeAmmo[%aidx] -= %amt;
+										if(%w != getWordCount(%item.types))
+											%aidx = getWord(%item.types, %w);
+
+										%type = %db2.AEType[%aidx];
+
+										if(%db2.AENoReserve[%aidx])
+											continue;
+
+										if(%pl.AEReserve[%type] + %item.aeAmmo[%aidx, %s] <= %type.AEMax)
+										{
+											%res = true;
+											%pl.AEReserve[%type] += %item.aeAmmo[%aidx, %s];
+											%pl.AENotifyAmmo(%item.aeAmmo[%aidx, %s], %type);
+											if(!isObject(%item.spawnBrick) && !%item.static)
+												%item.aeAmmo[%aidx, %s] = 0;
+										}
+										else if(%pl.AEReserve[%type] < %type.AEMax)
+										{
+											%res = true;
+											%amt = %type.AEMax - %pl.AEReserve[%type];
+											%pl.AEReserve[%type] += %amt;
+
+											%pl.AENotifyAmmo(%amt, %type);
+											if(!isObject(%item.spawnBrick) && !%item.static)
+												%item.aeAmmo[%aidx, %s] -= %amt;
+										}
 									}
+
+									if(isObject(%item.spawnBrick) && %item.static && %res)
+										%item.respawn();
+
+									return;
 								}
-
-								if(isObject(%item.spawnBrick) && %item.static && %res)
-									%item.respawn();
-
-								return;
 							}
 						}
 					}
@@ -996,101 +1075,43 @@ package aeAmmo
 
 		return Parent::onCollision(%db,%pl,%item,%a,%b,%c,%d,%e,%f);
 	}
-};
-activatePackage(aeAmmo);
 
-function Player::AENotifyAmmo(%pl, %amt, %type)
-{
-	if(%amt <= 0)
-		return;
-
-	if($Pref::AEBase::ammosound && getSimTime() - %pl.lastPickupSound > 100)
-	{
-		serverPlay3D(AEAmmoPickupSound, %pl.getPosition());
-		%pl.lastPickupSound = getSimTime();
-	}
-
-	if(isObject(%img = %pl.getMountedImage(0)) && %img.item.aebase)
-		%pl.baadDisplayAmmo(%img);
-
-	if(!isObject(%cl = %pl.Client) || !isObject(%type) || %type.AEAmmo $= "ALL")
-		return;
-
-	if($Pref::AEBase::ammomessage)
-		messageClient(%cl, '', "<font:arial bold:14><color:f8fc03>+" @ %amt SPC %type.aeAmmo @ " ammo");
-}
-
-function Player::AEDumpAmmo(%pl)
-{
-	if(!$Pref::AEBase::AmmoDeathDrop)
-		return;
-
-	for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
-	{
-		%type = aeAmmoSet.getObject(%i);
-
-		if((%amt = %pl.AEReserve[%type]) !$= "" && %type.aeAmmo !$= "ALL")
-		{
-			if(%amt <= 0)
-				continue;
-
-			%itm = new Item()
-			{
-				dataBlock = %type;
-				position = %pl.getHackPosition();
-				canPickup = true;
-				static = false;
-				minigame = getMinigameFromObject(%pl);
-				bl_id = (isObject(%cl = %pl.Client) ? %cl.getBLID() : -1);
-			};
-
-			%itm.setCollisionTimeout(%pl);
-			%itm.setVelocity(getRandom(-6, 6) SPC getRandom(-6, 6) SPC getRandom(-6, 6));
-			%itm.schedulePop();
-			%itm.aeAmmo = %amt;
-
-			MissionCleanup.add(%itm);
-
-			%pl.AEReserve[%type] = 0;
-		}
-	}
-}
-
-package aeAmmoPersist
-{
 	function Player::onInvShiftSwap(%pl, %pre, %predb, %post, %postdb)
 	{
 		%back = Parent::onInvShiftSwap(%pl, %pre, %predb, %post, %postdb);
 
 		if(%back)
 		{
-			%preAmmo = %pl.aeAmmo[%pre, ""];
-			%postAmmo = %pl.aeAmmo[%post, ""];
-			if(%postAmmo !$= "") %pl.aeAmmo[%pre, ""] = %postAmmo;
-			if(%preAmmo !$= "") %pl.aeAmmo[%post, ""] = %preAmmo;
+			for(%s = 0; %s < 4; %s++)
+			{
+				%preAmmo = %pl.aeAmmo[%pre, "", %s];
+				%postAmmo = %pl.aeAmmo[%post, "", %s];
+				%pl.aeAmmo[%pre, "", %s] = %postAmmo;
+				%pl.aeAmmo[%post, "", %s] = %preAmmo;
 
-			for(%i = 0; %i < getWordCount(%predb.AEAmmoTypes); %i++)
-			{
-				%type = getWord(%itm.AEAmmoTypes, %i);
-				%preAmmo[%type] = %pl.aeAmmo[%pre, %type];
-			}
+				for(%i = 0; %i < getWordCount(%predb.AEAmmoTypes); %i++)
+				{
+					%type = getWord(%itm.AEAmmoTypes, %i);
+					%preAmmo[%type] = %pl.aeAmmo[%pre, %type, %s];
+				}
 
-			for(%i = 0; %i < getWordCount(%postdb.AEAmmoTypes); %i++)
-			{
-				%type = getWord(%itm.AEAmmoTypes, %i);
-				%postAmmo[%type] = %pl.aeAmmo[%post, %type];
-			}
-			// This is fucking retarded and I should probably look for a better way of doing it
-			for(%i = 0; %i < getWordCount(%predb.AEAmmoTypes); %i++)
-			{
-				%type = getWord(%itm.AEAmmoTypes, %i);
-				if(%preAmmo[%type] !$= "") %pl.aeAmmo[%post, %type] = %preAmmo[%type];
-			}
+				for(%i = 0; %i < getWordCount(%postdb.AEAmmoTypes); %i++)
+				{
+					%type = getWord(%itm.AEAmmoTypes, %i);
+					%postAmmo[%type] = %pl.aeAmmo[%post, %type, %s];
+				}
 
-			for(%i = 0; %i < getWordCount(%postdb.AEAmmoTypes); %i++)
-			{
-				%type = getWord(%itm.AEAmmoTypes, %i);
-				if(%postAmmo[%type] !$= "") %pl.aeAmmo[%pre, %type] = %postAmmo[%type];
+				for(%i = 0; %i < getWordCount(%predb.AEAmmoTypes); %i++)
+				{
+					%type = getWord(%itm.AEAmmoTypes, %i);
+					%pl.aeAmmo[%post, %type, %s] = %preAmmo[%type];
+				}
+
+				for(%i = 0; %i < getWordCount(%postdb.AEAmmoTypes); %i++)
+				{
+					%type = getWord(%itm.AEAmmoTypes, %i);
+					%pl.aeAmmo[%pre, %type, %s] = %postAmmo[%type];
+				}
 			}
 		}
 
@@ -1113,4 +1134,5 @@ package aeAmmoPersist
 		return Parent::onRemove(%db, %pl, %x, %y);
 	}
 };
-activatePackage(aeAmmoPersist);
+
+activatePackage(aeAmmo);
