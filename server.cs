@@ -1136,7 +1136,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 
 	for(%i = 0; %i < %this.projectileCount; %i++)
 	{
-		%vector = %obj.getMuzzleVector(0);
+		%vector = %obj.getMuzzleVector(%slot);
 		if(%obj.burst[%this, %slot] <= %grace)
 		{
 			if(%obj.burst[%this, %slot] == 1)
@@ -1325,7 +1325,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 			dataBlock = ShotgunBlastProjectile;
 			directDamage = %this.concBlastDamage;
 			vehicleDamage = %vehicleMult;
-			initialVelocity = vectorScale(%obj.getMuzzleVector(0), 100);
+			initialVelocity = vectorScale(%obj.getMuzzleVector(%slot), 100);
 			initialPosition = %obj.getMuzzlePoint(%slot);
 			sourceObject = %obj;
 			sourceSlot = %slot;
@@ -1463,7 +1463,7 @@ function WeaponImage::AEMountSetup(%this, %obj, %slot)
 	%obj.aeLastItem[%idx] = %itm;
 
 	%obj.baadDisplayAmmo(%this);
-	%obj.aeLaserLoop(%this);
+	%obj.aeLaserLoop(%this, %slot);
 
 	if(%obj.IsA("Player") || %obj.IsA("AIPlayer"))
 	{
@@ -1518,62 +1518,62 @@ function ShapeBase::getHackPosition(%obj)
 	return %obj.getPosition();
 }
 
-// should probably move all this laser related stuff elsewhere
-
 if(isFile($f = "config/server/aebasecl.cs"))
  	exec($f);
 
-// function serverCmdLaserColor(%cl, %r, %g, %b) // ae got salty because this would result in inconsistent color (red gun laser + green laser dot)
-// {
-// 	%r = trim(%r);
-// 	%g = trim(%g);
-// 	%b = trim(%b);
+function serverCmdLaserColor(%cl, %r, %g, %b)
+{
+	%r = trim(%r);
+	%g = trim(%g);
+	%b = trim(%b);
 
-// 	if(%r $= "" || %g $= "" || %b $= "")
-// 	{
-// 		messageClient(%cl, '', "\c5Invalid color");
-// 		messageClient(%cl, '', "\c5Usage: /LaserColor [r] [g] [b]");
-// 		return;
-// 	}
+	if(%r $= "" || %g $= "" || %b $= "")
+	{
+		%cl.aeLaserColor = "";
 
-// 	if(%r > 1 || %g > 1 || %b > 1)
-// 	{
-// 		%r *= 1/255;
-// 		%g *= 1/255;
-// 		%b *= 1/255;
-// 	}
+		messageClient(%cl, '', "\c5Invalid color");
+		messageClient(%cl, '', "\c5Usage: /LaserColor [r] [g] [b]");
+		return;
+	}
 
-// 	%r = mClampF(%r, 0, 1);
-// 	%g = mClampF(%g, 0, 1);
-// 	%b = mClampF(%b, 0, 1);
+	if(%r > 1 || %g > 1 || %b > 1)
+	{
+		%r *= 1/255;
+		%g *= 1/255;
+		%b *= 1/255;
+	}
 
-// 	%col = %r SPC %g SPC %b;
+	%r = mClampF(%r, 0, 1);
+	%g = mClampF(%g, 0, 1);
+	%b = mClampF(%b, 0, 1);
 
-// 	%cl.aeLaserColor = %col SPC "1";
+	%col = %r SPC %g SPC %b;
 
-// 	if(isObject(%dot = %cl.Player.laserDot))
-// 		%dot.setNodeColor("ALL", %cl.aeLaserColor);
+	%cl.aeLaserColor = %col;
 
-// 	messageClient(%cl, '', "<color:" @ rgb2hex(%col) @ ">Set laser color.");
+	if(isObject(%dot = %cl.Player.laserDot))
+		%dot.setNodeColor("ALL", %cl.aeLaserColor);
 
-// 	$AEClient_LaserColor[%cl.getBLID()] = %col SPC "1";
+	messageClient(%cl, '', "<color:" @ rgb2hex(%col) @ ">Set laser color.");
 
-// 	export("$AEClient_*", "config/server/aebasecl.cs");
-// }
+	$AEClient_LaserColor[%cl.getBLID()] = %col;
 
-// function serverCmdAToggle(%cl)
-// {
-// 	if(%cl.attachOff)
-// 	{
-// 		%cl.attachOff = false;
-// 		messageClient(%cl, '', "\c2Enabled lasers and flashlights.");
-// 	}
-// 	else
-// 	{
-// 		%cl.attachOff = true;
-// 		messageClient(%cl, '', "Disabled lasers and flashlights.");
-// 	}
-// }
+	export("$AEClient_*", "config/server/aebasecl.cs");
+}
+
+function serverCmdAToggle(%cl)
+{
+	if(%cl.attachOff)
+	{
+		%cl.attachOff = false;
+		messageClient(%cl, '', "\c2Enabled flashlights.");
+	}
+	else
+	{
+		%cl.attachOff = true;
+		messageClient(%cl, '', "Disabled flashlights.");
+	}
+}
 
 function hasItemOnList(%string,%item)
 {
@@ -1623,13 +1623,10 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 	// 	}
 	// }
 
-	if((getWordCount(%off) <= 0 || !hasItemOnList(%off, %pl.getImageState(%slot))) && (!%pl.Client.attachOff || %img.ignoreAToggle))
+	if((getWordCount(%off) <= 0 || !hasItemOnList(%off, %pl.getImageState(%slot))))
 	{
-		//1 if(!isObject(%cl = %pl.Client) || %cl.aeLaserColor $= "")
-		// 	%cl.aeLaserColor = "1 0 0 1";
-
-		// if(isObject(%cl) && !%cl.IsA("AIPlayer") && (%col = $AEClient_LaserColor[%cl.getBLID()]) !$= "")
-		// 	%cl.aeLaserColor = %col;
+		if(isObject(%cl = %pl.client) && !%cl.IsA("AIPlayer") && (%col = $AEClient_LaserColor[%cl.getBLID()]) !$= "")
+			%cl.aeLaserColor = %col;
 
 		if(%img.laserDistance > 1 || %img.flashlightDistance > 1)
 		{
@@ -1667,6 +1664,8 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 
 					cancel(%pl.aeLaserCleanup[%slot]);
 
+					%alpha = getWord(%img.laserColor, 3);
+
 					if(!isObject(%pl.laserDot[%slot]))
 					{
 						%pl.laserDot[%slot] = new StaticShape()
@@ -1674,7 +1673,10 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 							dataBlock = AELaserDotShape;
 						};
 
-						%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
+						if(%cl.aeLaserColor !$= "")
+							%pl.laserDot[%slot].setNodeColor("ALL", %cl.aeLaserColor SPC %alpha);
+						else
+							%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
 
 						%pl.laserDot[%slot].startFade(1,0,1);
 
@@ -1689,17 +1691,22 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 
 					if(%img.laserFade !$= "" && %img.laserFade < %img.laserDistance)
 					{
-						%alpha = getWord(%img.laserColor, 3);
 						if((%dist = vectorDist(%pos, %point)) > %img.laserFade)
 						{
 							%mult = (%dist - %img.laserFade) / (%img.laserDistance - %img.laserFade);
 							%alpha = mFloatLerp(%alpha, 0, 1 - %mult);
 
-							%pl.laserDot[%slot].setNodeColor("ALL", getWords(%img.laserColor, 0, 2) SPC %alpha);
+							if(%cl.aeLaserColor !$= "")
+								%pl.laserDot[%slot].setNodeColor("ALL", %cl.aeLaserColor SPC %alpha);
+							else
+								%pl.laserDot[%slot].setNodeColor("ALL", getWords(%img.laserColor, 0, 2) SPC %alpha);
 						}
 						else
 						{
-							%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
+							if(%cl.aeLaserColor !$= "")
+								%pl.laserDot[%slot].setNodeColor("ALL", %cl.aeLaserColor SPC %alpha);
+							else
+								%pl.laserDot[%slot].setNodeColor("ALL", %img.laserColor);
 						}
 					}
 
@@ -1712,7 +1719,7 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 				}
 			}
 
-			if(%img.flashlightDistance > 1)
+			if(%img.flashlightDistance > 1 && !%pl.client.attachOff)
 			{
 				%end = vectorAdd(%pos, vectorScale(%vec, %img.flashlightDistance));
 				%ray = containerRayCast(%pos, %end, %mask, %pl);
@@ -1903,8 +1910,9 @@ function serverCmdAeHelp(%cl)
 	messageClient(%cl, '', "\c2AEBase by Oxy and aebaadcode");
 	messageClient(%cl, '', "\c2/guninfo\c6 - shows you the stats of the gun you are holding");
 	messageClient(%cl, '', "\c2/ztoggle\c6 - toggles smooth zoom");
-	// messageClient(%cl, '', "\c2/atoggle\c6 - toggles mounted attachments");
+	messageClient(%cl, '', "\c2/atoggle\c6 - toggles mounted flashlights");
 	messageClient(%cl, '', "\c2/adshold\c6 - toggles ADS holding");
+	messageClient(%cl, '', "\c2/lasercolor R G B\c6 - change your laser's color");
 	messageClient(%cl, '', "\c2/fov NUMBER\c6 - change your default fov");
 	messageClient(%cl, '', "\c2/dropammo AMMOTYPE NUMBER\c6 - drop your reserve ammo (drops current weapon's reserve if ammo type isn't specified)");
 	messageClient(%cl, '', "\c2/listammo\c6 - shows you your reserve ammo count");
