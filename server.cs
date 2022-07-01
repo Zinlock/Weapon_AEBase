@@ -1530,6 +1530,7 @@ function serverCmdLaserColor(%cl, %r, %g, %b)
 	if(%r $= "" || %g $= "" || %b $= "")
 	{
 		%cl.aeLaserColor = "";
+		$AEClient_LaserColor[%cl.getBLID()] = "";
 
 		messageClient(%cl, '', "\c5Invalid color");
 		messageClient(%cl, '', "\c5Usage: /LaserColor [r] [g] [b]");
