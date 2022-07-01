@@ -713,38 +713,40 @@ function Player::AENotifyAmmo(%pl, %amt, %type)
 
 function Player::AEDumpAmmo(%pl)
 {
-	if(!$Pref::AEBase::AmmoDeathDrop)
-		return;
+	%itm = new Item()
+	{
+		dataBlock = AE_DeathAmmoItem;
+		position = %pl.getHackPosition();
+		canPickup = true;
+		static = false;
+		minigame = getMinigameFromObject(%pl);
+		bl_id = (isObject(%cl = %pl.Client) ? %cl.getBLID() : -1);
+	};
+
+	%itm.setCollisionTimeout(%pl);
+	%itm.setVelocity(getRandom(-6, 6) SPC getRandom(-6, 6) SPC getRandom(-6, 6));
+	%itm.schedulePop();
+	MissionCleanup.add(%itm);
+
+	%empty = 1;
 
 	for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
 	{
 		%type = aeAmmoSet.getObject(%i);
 
-		if((%amt = %pl.AEReserve[%type]) !$= "" && %type.aeAmmo !$= "ALL")
+		if((%amt = %pl.AEReserve[%type]) !$= "" && %type.aeAmmo !$= "ALL" && %type.aeAmmo !$= "ALL")
 		{
 			if(%amt <= 0)
 				continue;
 
-			%itm = new Item()
-			{
-				dataBlock = %type;
-				position = %pl.getHackPosition();
-				canPickup = true;
-				static = false;
-				minigame = getMinigameFromObject(%pl);
-				bl_id = (isObject(%cl = %pl.Client) ? %cl.getBLID() : -1);
-			};
-
-			%itm.setCollisionTimeout(%pl);
-			%itm.setVelocity(getRandom(-6, 6) SPC getRandom(-6, 6) SPC getRandom(-6, 6));
-			%itm.schedulePop();
-			%itm.aeAmmo = %amt;
-
-			MissionCleanup.add(%itm);
-
+			%itm.aeAmmo[%type] = %amt;
 			%pl.AEReserve[%type] = 0;
+			%empty = 0;
 		}
 	}
+
+	if(%empty)
+		%itm.delete();
 }
 
 function ShapeBase::AEReloadWeapon(%pl, %slot)
@@ -847,10 +849,12 @@ package aeAmmo
 
 			%obj.setShapeNameDistance(15);
 
-			if(%this.AEAmmo !$= "ALL")
-				%obj.setShapeName(%uiName SPC "(" @ %amt @ ")");    
-			else
+			if(%this.AEAmmo !$= "ALL" && %this.AEAmmo !$= "MULTI")
+				%obj.setShapeName(%uiName SPC "(" @ %amt @ ")");
+			else if(%this.AEAmmo $= "ALL")
 				%obj.setShapeName(%uiName SPC "(ALL)");
+			else
+				%obj.setShapeName("Ammo Supply");
 
 			if(%this.AERefill > 0)
 				%obj.aeAmmo = %this.AERefill;
@@ -911,6 +915,54 @@ package aeAmmo
 					{
 						%pl.AENotifyAmmo(1);
 
+						if(isObject(%item.spawnBrick) && %item.static)
+							%item.respawn();
+						else
+							%item.schedule(0, delete);
+					}
+				}
+				else if(%db.aeAmmo $= "MULTI")
+				{
+					%res = false;
+					%empty = true;
+
+					for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
+					{
+						%type = aeAmmoSet.getObject(%i);
+						
+						%amt = %item.aeAmmo[%type];
+
+						if(%amt > 0)
+						{
+							if(%pl.AEReserve[%type] + %amt <= %type.AEMax)
+							{
+								%pl.AEReserve[%type] += %amt;
+								%amt = 0;
+								%res = true;
+							}
+							else
+							{
+								%final = %type.AEMax - %pl.AEReserve[%type];
+								%pl.AEReserve[%type] += %final;
+								%amt -= %final;
+
+								if(%final > 0)
+									%res = true;
+							}
+						}
+
+						if(!isObject(%item.spawnBrick) && !%item.static)
+							%item.aeAmmo[%type] = %amt;
+
+						if(%amt > 0 && %empty)
+							%empty = false;
+					}
+					
+					if(%res)
+						%pl.AENotifyAmmo(1);
+					
+					if(%empty)
+					{
 						if(isObject(%item.spawnBrick) && %item.static)
 							%item.respawn();
 						else
@@ -1120,7 +1172,7 @@ package aeAmmo
 
 	function Armor::onDisabled(%db, %pl, %state)
 	{
-		if(isObject(%pl))
+		if(isObject(%pl) && $Pref::AEBase::AmmoDeathDrop)
 			%pl.AEDumpAmmo();
 
 		return Parent::onDisabled(%db, %pl, %state);
@@ -1128,7 +1180,7 @@ package aeAmmo
 
 	function Armor::onRemove(%db, %pl, %x, %y)
 	{
-		if(isObject(%pl))
+		if(isObject(%pl) && $Pref::AEBase::AmmoDeathDrop)
 			%pl.AEDumpAmmo();
 
 		return Parent::onRemove(%db, %pl, %x, %y);

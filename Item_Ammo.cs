@@ -125,6 +125,15 @@ datablock ItemData(AE_AmmoItem : hammerItem)
 	AEAmmo = "ALL";
 };
 
+datablock ItemData(AE_DeathAmmoItem : AE_AmmoItem)
+{
+	//shapeFile = "./dts/ammo/death.dts";
+	uiName = "";
+
+	AEIsAmmo = true;
+	AEAmmo = "MULTI";
+};
+
 datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/762mm.dts";
