@@ -871,6 +871,16 @@ package WeaponFeatures
 		parent::serverCmdPlantBrick(%client);
 	}
 
+	function ServerCmdCancelBrick(%client)
+	{
+		%obj = %client.player;
+		if(isObject(%obj) && isObject(%img = %obj.getMountedImage(0)) && %img.flashlightDistance > 0 && !%img.ignoreAToggle)
+		{
+			serverCmdFToggle(%client);
+		}
+		parent::ServerCmdCancelBrick(%client);
+	}
+
 	function Armor::onTrigger(%this, %player, %slot, %val)
 	{
 		Parent::onTrigger(%this, %player, %slot, %val);
@@ -1562,17 +1572,17 @@ function serverCmdLaserColor(%cl, %r, %g, %b)
 	export("$AEClient_*", "config/server/aebasecl.cs");
 }
 
-function serverCmdAToggle(%cl)
+function serverCmdFToggle(%cl)
 {
 	if(%cl.attachOff)
 	{
 		%cl.attachOff = false;
-		messageClient(%cl, '', "\c2Enabled flashlights.");
+		%cl.centerPrint("\c2Enabled flashlights.", 1);
 	}
 	else
 	{
 		%cl.attachOff = true;
-		messageClient(%cl, '', "Disabled flashlights.");
+		%cl.centerPrint("Disabled flashlights.", 1);
 	}
 }
 
@@ -1720,7 +1730,7 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 				}
 			}
 
-			if(%img.flashlightDistance > 1 && !%pl.client.attachOff)
+			if(%img.flashlightDistance > 1 && (!%pl.client.attachOff || %img.ignoreAToggle))
 			{
 				%end = vectorAdd(%pos, vectorScale(%vec, %img.flashlightDistance));
 				%ray = containerRayCast(%pos, %end, %mask, %pl);
@@ -1911,7 +1921,7 @@ function serverCmdAeHelp(%cl)
 	messageClient(%cl, '', "\c2AEBase by Oxy and aebaadcode");
 	messageClient(%cl, '', "\c2/guninfo\c6 - shows you the stats of the gun you are holding");
 	messageClient(%cl, '', "\c2/ztoggle\c6 - toggles smooth zoom");
-	messageClient(%cl, '', "\c2/atoggle\c6 - toggles mounted flashlights");
+	messageClient(%cl, '', "\c2/ftoggle\c6 - toggles mounted flashlights");
 	messageClient(%cl, '', "\c2/adshold\c6 - toggles ADS holding");
 	messageClient(%cl, '', "\c2/lasercolor R G B\c6 - change your laser's color");
 	messageClient(%cl, '', "\c2/fov NUMBER\c6 - change your default fov");
