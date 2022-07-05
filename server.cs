@@ -760,6 +760,26 @@ registerOutputEvent(Bot, "resetAEDamageMult");
 registerOutputEvent(Bot, "setAEInfiniteAmmo", "bool");
 registerOutputEvent(Bot, "setAEScoped", "bool");
 
+$OutputDescription_["Player", "setAEDamageMult"] = "[mult]" NL
+																									 "Sets this player's damage multiplier for AEBase weapons." NL
+																									 "mult (0 - 10): New damage multiplier";
+
+$OutputDescription_["Player", "resetAEDamageMult"] = "Resets this player's AEBase damage multiplier to the server default.";
+
+$OutputDescription_["Bot", "setAEDamageMult"] = "[mult]" NL
+																								"Sets this bot's damage multiplier for AEBase weapons." NL
+																								"mult (0 - 10): New damage multiplier";
+
+$OutputDescription_["Bot", "resetAEDamageMult"] = "Resets this bot's AEBase damage multiplier to the server default.";
+
+$OutputDescription_["Bot", "setAEInfiniteAmmo"] = "[infinite]" NL
+																									"Gives this bot infinite ammo for AEBase weapons." NL
+																									"infinite: Infinite ammo toggle";
+
+$OutputDescription_["Bot", "setAEScoped"] = "[scoped]" NL
+																						"Makes this bot aim down an AEBase weapon's sights." NL
+																						"scoped: Scoped toggle";
+
 function Player::setAEDamageMult(%pl, %mult)
 {
 	%pl.AEDamageMult = %mult;

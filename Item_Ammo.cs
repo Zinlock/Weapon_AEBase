@@ -32,6 +32,24 @@ function AEMakeAmmo()
 	AEAmmoSet.ammo[0] = AE_AmmoItem;
 }
 
+$OutputDescription_["Player", "supplyAEAmmo"] = "[type] [amount] [tell]" NL
+																							 	"Gives this player AEBase reserve ammo." NL
+																								"type: Ammo type to give" NL
+																								"amount: Amount of ammo to give" NL
+																								"tell: Lists gained ammo count";
+
+$OutputDescription_["Player", "refillAEAmmo"] = "[type] [tell]" NL
+																							 	"Entirely refills this player's AEBase reserve ammo." NL
+																								"type: Ammo type to refill" NL
+																								"tell: Lists gained ammo count";
+
+$OutputDescription_["Player", "setAEAmmo"] = "[type] [amount] [tell] [force]" NL
+																						 "Sets this player's AEBase reserve ammo." NL
+																						 "type: Ammo type to set" NL
+																						 "amount: Amount of ammo to set to" NL
+																						 "tell: Lists gained ammo count" NL
+																						 "force: Bypass the default reserve limit";
+
 function Player::supplyAEAmmo(%pl, %idx, %amt, %note)
 {
 	if(%idx == 0)
