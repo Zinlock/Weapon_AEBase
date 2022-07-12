@@ -155,8 +155,35 @@ datablock ItemData(AE_DeathAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/762mm.dts";
-	uiName = "A: 7.62x39mm Heavy Rifle";
-	AEAmmo = "7.62x39mm";
+	uiName = "A: 7.62 Medium Rifle";
+	AEAmmo = "7.62 Medium Rifle";
+	AEMax = 270;
+	AERefill = 60;
+};
+
+datablock ItemData(AE_DMRAmmoItem : AE_AmmoItem)
+{
+	shapeFile = "./ammo/762mm.dts";
+	uiName = "A: 7.62 Marksman Rifle";
+	AEAmmo = "7.62 Marksman Rifle";
+	AEMax = 270;
+	AERefill = 60;
+};
+
+datablock ItemData(AE_LMGAmmoItem : AE_AmmoItem)
+{
+	shapeFile = "./ammo/762mm.dts";
+	uiName = "A: Light Machine Gun";
+	AEAmmo = "L. Machine Gun";
+	AEMax = 270;
+	AERefill = 60;
+};
+
+datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
+{
+	shapeFile = "./ammo/556mm.dts";
+	uiName = "A: 5.7 Little Rifle";
+	AEAmmo = "5.7 Little Rifle";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -164,8 +191,8 @@ datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/556mm.dts";
-	uiName = "A: 5.56x45mm Light Rifle";
-	AEAmmo = "5.56x45mm";
+	uiName = "A: 5.56 Medium Rifle";
+	AEAmmo = "5.56 Medium Rifle";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -173,8 +200,8 @@ datablock ItemData(AE_LightRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavySRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/50cal.dts";
-	uiName = "A: .50 Browning Machine Gun";
-	AEAmmo = ".50 BMG";
+	uiName = "A: 50. Heavy Sniper";
+	AEAmmo = ".50 Heavy Sniper";
 	AEMax = 40;
 	AERefill = 8;
 };
@@ -182,8 +209,8 @@ datablock ItemData(AE_HeavySRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_MediumSRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/338lmag.dts";
-	uiName = "A: .338 Lapua Magnum";
-	AEAmmo = ".338 L-Mag";
+	uiName = "A: .338 Sniper";
+	AEAmmo = ".338 Sniper";
 	AEMax = 64;
 	AERefill = 12;
 };
@@ -191,8 +218,8 @@ datablock ItemData(AE_MediumSRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightPAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/9mm.dts";
-	uiName = "A: 9x19mm Parabellum";
-	AEAmmo = "9mm Para";
+	uiName = "A: 9mm Pistol";
+	AEAmmo = "9mm Pistol";
 	AEMax = 210;
 	AERefill = 36;
 };
@@ -201,7 +228,7 @@ datablock ItemData(AE_SuperLightPAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/22lr.dts";
 	uiName = "A: .22 Long Rifle";
-	AEAmmo = ".22 LR";
+	AEAmmo = ".22 Long Rifle";
 	AEMax = 320;
 	AERefill = 68;
 };
@@ -209,8 +236,8 @@ datablock ItemData(AE_SuperLightPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_MediumPAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/45acp.dts";
-	uiName = "A: .45 Auto Colt Pistol";
-	AEAmmo = ".45 ACP";
+	uiName = "A: .45 Heavy Pistol";
+	AEAmmo = ".45 Heavy Pistol";
 	AEMax = 180;
 	AERefill = 28;
 };
@@ -218,8 +245,8 @@ datablock ItemData(AE_MediumPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavyPAmmoItem : AE_AmmoItem)
 {
 	//shapeFile = "./ammo/magnum.dts";
-	uiName = "A: 357 Magnum";
-	AEAmmo = ".357 Mag";
+	uiName = "A: .357 Magnum";
+	AEAmmo = ".357 Magnum";
 	AEMax = 120;
 	AERefill = 12;
 };
@@ -227,8 +254,8 @@ datablock ItemData(AE_HeavyPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavySAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/4ga.dts";
-	uiName = "A: 4 Gauge Heavy Shotgun";
-	AEAmmo = "4 Gauge";
+	uiName = "A: 4 Gauge Heavy S.";
+	AEAmmo = "4 Gauge Shotgun";
 	AEMax = 42;
 	AERefill = 6;
 };
@@ -236,8 +263,8 @@ datablock ItemData(AE_HeavySAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightSAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/12gaugebox.dts";
-	uiName = "A: 12 Gauge Light Shotgun";
-	AEAmmo = "12 Gauge";
+	uiName = "A: 12 Gauge Shotgun";
+	AEAmmo = "12 Gauge Shotgun";
 	AEMax = 64;
 	AERefill = 12;
 };
@@ -245,8 +272,8 @@ datablock ItemData(AE_LightSAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_GrenadeLAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/40mm.dts";
-	uiName = "A: 40mm Grenade Launcher";
-	AEAmmo = "40mm GL";
+	uiName = "A: 40mm Grenade";
+	AEAmmo = "40mm Grenade";
 	AEMax = 12;
 	AERefill = 4;
 };
@@ -254,8 +281,8 @@ datablock ItemData(AE_GrenadeLAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_RocketLAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/rpg.dts";
-	uiName = "A: RPG Warheads";
-	AEAmmo = "RPG";
+	uiName = "A: Rocket L.";
+	AEAmmo = "Rocket L.";
 	AEMax = 6;
 	AERefill = 2;
 };
