@@ -1221,6 +1221,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan || %projType == 0 || %projType == 4)
 		{
 			%velocity = vectorScale(%vector, %this.projectileVelocity);
+			%velocity = vectorAdd(%velocity, vectorScale(%obj.getVelocity(), %this.projectileInheritance));
 
 			%directDamage = %this.projectileDamage;
 			%headshotMult = %this.projectileHeadshotMult;
@@ -1298,11 +1299,13 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		else if(%projType == 3 && %this.staticHitscan)
 		{
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vector, %this.projectileVelocity), "0 0 " @ %this.projectileZOffset));
+			%vec = vectorNormalize(vectorAdd(vectorScale(%vec, 200), vectorScale(%obj.getVelocity(), %this.projectileInheritance)));
 			createStaticHitscan_aebase(%obj, %this, %obj.getMuzzlePoint(%slot), %vec);
 		}
 		else if(%projType == 2 && %this.staticHitscan || %projType == 1 || %this.staticRealHitscan)
 		{
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vector, %this.projectileVelocity), "0 0 " @ %this.projectileZOffset));
+			%vec = vectorNormalize(vectorAdd(vectorScale(%vec, 200), vectorScale(%obj.getVelocity(), %this.projectileInheritance)));
 			%obj.fireRaycastProjectile(%this, %obj.getMuzzlePoint(%slot), %vec);
 		}
 	}
