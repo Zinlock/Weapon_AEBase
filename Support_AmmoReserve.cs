@@ -873,7 +873,7 @@ package aeAmmo
 			else if(%this.AEAmmo $= "ALL")
 				%obj.setShapeName(%uiName SPC "(ALL)");
 			else
-				%obj.setShapeName("Ammo Supply");
+				%obj.setShapeName("Ammo Pile");
 
 			if(%this.AERefill > 0)
 				%obj.aeAmmo = %this.AERefill;
