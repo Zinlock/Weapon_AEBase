@@ -261,6 +261,7 @@ function Player::baadDisplayAmmo(%obj, %this)
 		%ammo = %obj.AEAmmo[%obj.currTool, %type, 0];
 		%automode = %this.item.Auto;
 		%ammo_max = %this.item.AEAmmo[%type];
+		%nomag = %this.item.AEUseReserve[%type];
 
 		if(%this.item.AENoReserve[%type])
 			%ammo_name = %this.item.AEType[%type];
@@ -274,38 +275,57 @@ function Player::baadDisplayAmmo(%obj, %this)
 
 		if($Pref::AEBase::ReserveAmmo && !%this.item.AENoReserve[%type] && !%obj.AEInfReserve)
 			%ammo_mix = %ammo_reserve;
-		else
+		else if(!%nomag)
 			%ammo_mix = %ammo_max;
+		else
+			%ammo_mix = "inf";
 
-		%at = %ammo / %ammo_max;
+		if(%nomag)
+			%at = 1;
+		else
+			%at = %ammo / %ammo_max;
 
 		switch($Pref::AEBase::HUD)
 		{
 			case 0: // aebase
 				%start = "1 1 1";
 				%end = "1 0 0";
-				%final = "<color:" @ rgb2hex(RGBLerp(%start, %end, %at)) @ "><font:impact:54>" @ %ammo @ "<color:FFFFFF><font:arial:54> / <font:impact:54>" @ %ammo_mix @ "<br><font:arial:20>" @ %ammo_name;
+
+				if(%nomag)
+					%final = "<color:" @ rgb2hex(RGBLerp(%start, %end, %at)) @ "><font:impact:54>" @ %ammo_mix @ "<br><font:arial:20>" @ %ammo_name;
+				else
+					%final = "<color:" @ rgb2hex(RGBLerp(%start, %end, %at)) @ "><font:impact:54>" @ %ammo @ "<color:FFFFFF><font:arial:54> / <font:impact:54>" @ %ammo_mix @ "<br><font:arial:20>" @ %ammo_name;
 
 			case 1: // tier tac
 				%desc = "<font:impact:24><color:fff000>" @ %ammo_name;
-				%counter = "<font:impact:34>\c6" @ %ammo @ " / " @ %ammo_mix;
+
+				if(%nomag)
+					%counter = "<font:impact:34>\c6" @ %ammo_mix;
+				else
+					%counter = "<font:impact:34>\c6" @ %ammo @ " / " @ %ammo_mix;
+
 				%final = %desc SPC %counter;
 
 			case 2: // adv pack
 				%ammocol = "<color:ffffff>";
-				%str = %ammo @ "/" @ %ammo_mix SPC "<font:tahoma:20>AMMO";
+
+				if(%nomag)
+					%str = %ammo_mix SPC "<font:tahoma:20>AMMO";
+				else
+					%str = %ammo @ "/" @ %ammo_mix SPC "<font:tahoma:20>AMMO";
+				
 				%final = %ammocol @ "<font:impact:24>" @ %str @ " ";
 
 			case 3: // rallypack
 				%size = 45 - %ammo_max;
 				%size = mClamp(%size, 15, 45);
 
-				if(%ammo_max <= 1)
+				if(%ammo_max <= 1 || %nomag)
 					%size = 20;
 
 				%string = "<font:impact:15>\c7" @ %ammo_name SPC "<br><font:impact:" @ %size @ ">\c7";
 
-				if(%ammo_max > 1)
+				if(%ammo_max > 1 && !%nomag)
 				{
 					%start = "0 1 0";
 					%end = "1 0 0";
@@ -339,9 +359,16 @@ function Player::baadDisplayAmmo(%obj, %this)
 				}
 				else
 				{
-					if(%ammo >= 0)
+					if(%nomag)
 					{
-						if(%ammo)
+						if(%ammo_mix > 0 || %ammo_mix $= "inf")
+							%astring = "\c2Loaded";
+						else
+							%astring = "\c0Not Loaded";
+					}
+					else
+					{
+						if(%ammo > 0)
 							%astring = "\c2Loaded";
 						else
 							%astring = "\c0Not Loaded";
@@ -375,24 +402,44 @@ function Player::baadDisplayAmmo(%obj, %this)
 			case 4: // sweps
 				%col = "FFFFFF";
 
-				if(%ammo <= 0)
+				if(%nomag && %ammo_mix <= 0 && ammo_mix !$= "inf" || !%nomag && %ammo <= 0 )
 					%col = "ff7777";
 
 				%col = "<color:" @ %col @ ">";
 
-				%final = "<font:impact:34>" @ %col @ %ammo @ " <color:bbbbbb><font:impact:24>" @ %ammo_mix @ " " @ " <color:ffffaa> <br><font:impact:18> " @ %ammo_name;
+				if(%nomag)
+					%final = "<font:impact:34>" @ %col @ %ammo_mix @ "  <color:ffffaa> <br><font:impact:18> " @ %ammo_name;
+				else
+					%final = "<font:impact:34>" @ %col @ %ammo @ " <color:bbbbbb><font:impact:24>" @ %ammo_mix @ "  <color:ffffaa> <br><font:impact:18> " @ %ammo_name;
 
 			case 5: // gcats
 				%col = "00FF00";
 
-				if(%ammo <= 0)
-					%col = "FF0000";
-				else if(%ammo <= %ammo_max / 4)
-					%col = "FFFF00";
+				if(%nomag)
+				{
+					if(%ammo_mix !$= "inf")
+					{
+						if(%ammo <= 0)
+							%col = "FF0000";
+						else if(%ammo <= %ammo_max / 4)
+							%col = "FFFF00";
+					}
 
-				%col = "<color:" @ %col @ ">";
+					%col = "<color:" @ %col @ ">";
 
-				%final = %col @ %ammo @ "/" @ %ammo_mix @ " " @ %ammo_name;
+					%final = %col @ %ammo_mix @ " " @ %ammo_name;
+				}
+				else
+				{
+					if(%ammo <= 0)
+						%col = "FF0000";
+					else if(%ammo <= %ammo_max / 4)
+						%col = "FFFF00";
+
+					%col = "<color:" @ %col @ ">";
+
+					%final = %col @ %ammo @ "/" @ %ammo_mix @ " " @ %ammo_name;
+				}
 
 			case 6: // verbal
 				%text = "Fully loaded";
@@ -446,7 +493,12 @@ function Player::baadDisplayAmmo(%obj, %this)
 
 			case 7: // bkt
 				%desc = "<font:impact:24><color:FF0000>" @ %ammo_name;
-				%counter = "<font:impact:34>\c6" @ %ammo @ " / " @ %ammo_mix;
+
+				if(%nomag)
+					%counter = "<font:impact:34>\c6" @ %ammo_mix;
+				else
+					%counter = "<font:impact:34>\c6" @ %ammo @ " / " @ %ammo_mix;
+				
 				%final = %desc SPC %counter;
 
 			case 8: // blockality
@@ -455,17 +507,32 @@ function Player::baadDisplayAmmo(%obj, %this)
                 else
 				%firemode = "|";
 				%desc = "<font:impact:24><color:FF0000>" @ %firemode @"  <font:impact:34>\c6";
-				%counter = %ammo @ " / " @ %ammo_mix;
+				
+				if(%nomag)
+					%counter = %ammo_mix;
+				else
+					%counter = %ammo @ " / " @ %ammo_mix;
+				
 				%final = %desc SPC %counter;
 
 			case 9: // nekram
 				%desc = "<color:0aa000><font:Arial:20>\c6";
-				%counter = %ammo @ " / " @ %ammo_mix;
+
+				if(%nomag)
+					%counter = %ammo_mix;
+				else
+					%counter = %ammo @ " / " @ %ammo_mix;
+				
 				%final = %desc SPC %counter;
 
 			case 10: // tactical
 				%desc = "<color:0aa000><font:impact:38>\c6";
-				%counter = %ammo @ " / " @ %ammo_mix;
+				
+				if(%nomag)
+					%counter = %ammo_mix;
+				else
+					%counter = %ammo @ " / " @ %ammo_mix;
+				
 				%final = %desc SPC %counter;
 
 			case 11: // none
@@ -1399,7 +1466,12 @@ function WeaponImage::AEOnFire(%this, %obj, %slot)
 {
 	%obj.AEFire(%this, %slot);
 
-	if(!%obj.AEInfAmmo)
+	if(%this.item.AEUseReserve[%this.AEUseAmmo])
+	{
+		if(!%obj.AEInfReserve)
+			%obj.AEReserve[%this.item.AEType[%this.AEUseAmmo]]--;
+	}
+	else if(!%obj.AEInfAmmo)
 		%obj.AEAmmo[%obj.currTool, %this.AEUseAmmo, %slot]--;
 
 	if(%obj.IsA("Player"))

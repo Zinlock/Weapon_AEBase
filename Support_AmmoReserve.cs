@@ -7,41 +7,46 @@ function ShapeBase::aeAmmoCheck(%pl, %slot)
 	%aIdx = %img.AEUseAmmo;
 	%type = %itm.AEType[%aIdx];
 
-	if(%pl.AEInfAmmo)
-		return 2;
-
-	if(!%itm.AENoReserve[%aIdx])
+	if(!%itm.AEUseReserve[%aIdx])
 	{
-		if(!isObject(%type))
+		if(%pl.AEInfAmmo)
+			return 2;
+
+		if(!%itm.AENoReserve[%aIdx])
 		{
-			warn("invalid AE item" SPC %itm SPC "(ammo type does not exist)");
+			if(!isObject(%type))
+			{
+				warn("invalid AE item" SPC %itm SPC "(ammo type does not exist)");
+				return;
+			}
+			else if(%type.aeAmmo $= "ALL")
+			{
+				warn("invalid AE item" SPC %itm SPC "(ammo type is set to ALL)");
+				return;
+			}
+		}
+		
+		if(%itm.aeAmmo[%aIdx] <= 0 || %itm.aeAmmo[%aIdx] $= "")
+		{
+			warn("invalid AE item" SPC %itm SPC "(invalid ammo cap)");
 			return;
 		}
-		else if(%type.aeAmmo $= "ALL")
+
+		if(%pl.AEReloading)
 		{
-			warn("invalid AE item" SPC %itm SPC "(ammo type is set to ALL)");
-			return;
+			%pl.AEReloading = false;
+			return 0;
 		}
-	}
-	
-	if(%itm.aeAmmo[%aIdx] <= 0 || %itm.aeAmmo[%aIdx] $= "")
-	{
-		warn("invalid AE item" SPC %itm SPC "(invalid ammo cap)");
-		return;
-	}
 
-	if(%pl.AEReloading)
-	{
-		%pl.AEReloading = false;
-		return 0;
+		if(%pl.aeAmmo[%idx, %aIdx, %slot] >= %itm.aeAmmo[%aIdx])
+			return 2; // full
+		else if(%pl.aeAmmo[%idx, %aIdx, %slot] > 0)
+			return 1; // loaded
+		else
+			return 0; // empty
 	}
-
-	if(%pl.aeAmmo[%idx, %aIdx, %slot] >= %itm.aeAmmo[%aIdx])
-		return 2; // full
-	else if(%pl.aeAmmo[%idx, %aIdx, %slot] > 0)
-		return 1; // loaded
 	else
-		return 0; // empty
+		return %pl.AEReserveCheck(%slot);
 }
 
 function ShapeBase::AEReserveCheck(%pl, %slot)
@@ -98,6 +103,9 @@ function ShapeBase::AEMagReload(%pl, %slot)
 	%aIdx = %img.AEUseAmmo;
 	%type = %itm.AEType[%aIdx];
 
+	if(%itm.AEUseReserve[%aIdx])
+		return;
+
 	if(!%itm.AENoReserve[%aIdx])
 	{
 		if(!isObject(%type))
@@ -153,6 +161,9 @@ function ShapeBase::AEUnloadMag(%pl, %slot)
 	%aIdx = %img.AEUseAmmo;
 	%type = %itm.AEType[%aIdx];
 
+	if(%itm.AEUseReserve[%aIdx])
+		return;
+	
 	if(!%itm.AENoReserve[%aIdx])
 	{
 		if(!isObject(%type))
@@ -224,6 +235,9 @@ function ShapeBase::AEUnloadShell(%pl, %slot)
 
 	%aIdx = %img.AEUseAmmo;
 	%type = %itm.AEType[%aIdx];
+	
+	if(%itm.AEUseReserve[%aIdx])
+		return;
 
 	if(!%itm.AENoReserve[%aIdx])
 	{
@@ -293,6 +307,9 @@ function ShapeBase::AEShellReload(%pl, %slot)
 
 	%aIdx = %img.AEUseAmmo;
 	%type = %itm.AEType[%aIdx];
+	
+	if(%itm.AEUseReserve[%aIdx])
+		return;
 
 	if(!%itm.AENoReserve[%aIdx])
 	{
@@ -766,7 +783,7 @@ package aeAmmo
 	{
 		if(isObject(%pl = %cl.player) && isObject(%img = %pl.getMountedImage(0)) && %img.item.AEBase)
 		{
-			if(%pl.aeAmmoCheck(0) < 2 && %pl.AEReserveCheck(0) > 0)
+			if(%pl.aeAmmoCheck(0) < 2 && %pl.AEReserveCheck(0) > 0 && !%img.item.AEUseReserve[%img.AEUseAmmo])
 			{
 				%pl.AEReloadWeapon(0);
 
