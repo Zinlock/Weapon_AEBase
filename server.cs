@@ -1285,7 +1285,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 
 		%projType = (!%obj.IsA("AIPlayer") ? $Pref::AEBase::projectilesAs : $Pref::AEBase::projectilesAsBot);
 
-		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan || %projType == 0 || %projType == 4)
+		if(%this.alwaysSpawnProjectile || %projType != 1 && !%this.staticHitscan && !%this.staticRealHitscan || %projType == 0 || %projType == 4)
 		{
 			%velocity = vectorScale(%vector, %this.projectileVelocity);
 			%velocity = vectorAdd(%velocity, vectorScale(%obj.getVelocity(), %this.projectileInheritance));
