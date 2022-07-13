@@ -805,19 +805,21 @@ package aeAmmo
 		{
 			if(%pl.IsA("AIPlayer"))
 				%pl.AEInfReserve = true;
-			
-			for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
+			else
 			{
-				%type = aeAmmoSet.getObject(%i);
-
-				if(%pl.AEReserve[%type] $= "" && %type.aeAmmo !$= "ALL")
+				for(%i = 0; %i < aeAmmoSet.getCount(); %i++)
 				{
-					if($Pref::AEBase::FillReserveOnSpawn == 0)
-						%pl.AEReserve[%type] = 0;
-					else if($Pref::AEBase::FillReserveOnSpawn == 1)
-						%pl.AEReserve[%type] = %type.AERefill;
-					else if($Pref::AEBase::FillReserveOnSpawn == 2)
-						%pl.AEReserve[%type] = %type.AEMax;
+					%type = aeAmmoSet.getObject(%i);
+
+					if(%pl.AEReserve[%type] $= "" && %type.aeAmmo !$= "ALL")
+					{
+						if($Pref::AEBase::FillReserveOnSpawn == 0)
+							%pl.AEReserve[%type] = 0;
+						else if($Pref::AEBase::FillReserveOnSpawn == 1)
+							%pl.AEReserve[%type] = %type.AERefill;
+						else if($Pref::AEBase::FillReserveOnSpawn == 2)
+							%pl.AEReserve[%type] = %type.AEMax;
+					}
 				}
 			}
 		}
