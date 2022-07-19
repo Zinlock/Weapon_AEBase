@@ -164,8 +164,8 @@ datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_DMRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/762mm.dts";
-	uiName = "A: 7.62 Marksman Rifle";
-	AEAmmo = "7.62 Marksman Rifle";
+	uiName = "A: Marksman Rifle";
+	AEAmmo = "Marksman Rifle";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -182,8 +182,8 @@ datablock ItemData(AE_LMGAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/556mm.dts";
-	uiName = "A: 5.7 Little Rifle";
-	AEAmmo = "5.7 Little Rifle";
+	uiName = "A: 5.7 Defense Weapon";
+	AEAmmo = "5.7 Defense Weapon";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -191,8 +191,8 @@ datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/556mm.dts";
-	uiName = "A: 5.56 Medium Rifle";
-	AEAmmo = "5.56 Medium Rifle";
+	uiName = "A: 5.56 Little Rifle";
+	AEAmmo = "5.56 Little Rifle";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -254,7 +254,7 @@ datablock ItemData(AE_HeavyPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavySAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/4ga.dts";
-	uiName = "A: 4 Gauge Heavy S.";
+	uiName = "A: 4 Gauge Shotgun";
 	AEAmmo = "4 Gauge Shotgun";
 	AEMax = 42;
 	AERefill = 6;
