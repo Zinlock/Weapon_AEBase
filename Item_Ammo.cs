@@ -155,26 +155,17 @@ datablock ItemData(AE_DeathAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/762mm.dts";
-	uiName = "A: 7.62 Medium Rifle";
-	AEAmmo = "7.62 Medium Rifle";
+	uiName = "A: 7.62x39mm Medium";
+	AEAmmo = "7.62x39mm Medium";
 	AEMax = 270;
 	AERefill = 60;
 };
 
-datablock ItemData(AE_DMRAmmoItem : AE_AmmoItem)
+datablock ItemData(AE_HeavierRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/762mm.dts";
-	uiName = "A: Marksman Rifle";
-	AEAmmo = "Marksman Rifle";
-	AEMax = 270;
-	AERefill = 60;
-};
-
-datablock ItemData(AE_LMGAmmoItem : AE_AmmoItem)
-{
-	shapeFile = "./ammo/762mm.dts";
-	uiName = "A: Light Machine Gun";
-	AEAmmo = "L. Machine Gun";
+	uiName = "A: 7.62x51mm Heavy";
+	AEAmmo = "7.62x51mm Heavy";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -182,8 +173,8 @@ datablock ItemData(AE_LMGAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/556mm.dts";
-	uiName = "A: 5.7 Defense Weapon";
-	AEAmmo = "5.7 Defense Weapon";
+	uiName = "A: 5.7x28mm Defense";
+	AEAmmo = "5.7x28mm Defense";
 	AEMax = 270;
 	AERefill = 60;
 };
@@ -191,26 +182,26 @@ datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/556mm.dts";
-	uiName = "A: 5.56 Little Rifle";
-	AEAmmo = "5.56 Little Rifle";
+	uiName = "A: 5.56x45mm NATO";
+	AEAmmo = "5.56x45mm NATO";
 	AEMax = 270;
 	AERefill = 60;
 };
 
-datablock ItemData(AE_HeavySRAmmoItem : AE_AmmoItem)
+datablock ItemData(AE_HeavierSRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/50cal.dts";
-	uiName = "A: 50. Heavy Sniper";
-	AEAmmo = ".50 Heavy Sniper";
+	uiName = "A: .50 Caliber BMG";
+	AEAmmo = ".50 Caliber BMG";
 	AEMax = 40;
 	AERefill = 8;
 };
 
-datablock ItemData(AE_MediumSRAmmoItem : AE_AmmoItem)
+datablock ItemData(AE_HeavySRAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/338lmag.dts";
-	uiName = "A: .338 Sniper";
-	AEAmmo = ".338 Sniper";
+	uiName = "A: .408 Cheyenne Tactical";
+	AEAmmo = ".408 Cheyenne Tactical";
 	AEMax = 64;
 	AERefill = 12;
 };
@@ -218,8 +209,8 @@ datablock ItemData(AE_MediumSRAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_LightPAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/9mm.dts";
-	uiName = "A: 9mm Pistol";
-	AEAmmo = "9mm Pistol";
+	uiName = "A: 9x19mm Parabellum";
+	AEAmmo = "9x19mm Parabellum";
 	AEMax = 210;
 	AERefill = 36;
 };
@@ -236,8 +227,8 @@ datablock ItemData(AE_SuperLightPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_MediumPAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/45acp.dts";
-	uiName = "A: .45 Heavy Pistol";
-	AEAmmo = ".45 Heavy Pistol";
+	uiName = "A: .45 ACP";
+	AEAmmo = ".45 ACP";
 	AEMax = 180;
 	AERefill = 28;
 };
@@ -254,8 +245,8 @@ datablock ItemData(AE_HeavyPAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_HeavySAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/4ga.dts";
-	uiName = "A: 4 Gauge Shotgun";
-	AEAmmo = "4 Gauge Shotgun";
+	uiName = "A: 23x75mmR Heavy Shotgun";
+	AEAmmo = "23x75mmR Heavy Shotgun";
 	AEMax = 42;
 	AERefill = 6;
 };
