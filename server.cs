@@ -1380,16 +1380,16 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 	%obj.lastShotTime[%this, %slot] = getSimTime();
 
 	%lclimb = %this.medClimbThreshold;
-	if(%lclimb $= "") %lclimb = 0.05;
+	if(%lclimb $= "") %lclimb = 0.1;
 
 	%hclimb = %this.highClimbThreshold;
-	if(%hclimb $= "") %hclimb = 0.1;
+	if(%hclimb $= "") %hclimb = 0.35;
 
-	if(%climb > %hclimb)
+	if(%progress > %hclimb)
 	{
 		%this.AEOnHighClimb(%obj, %slot);
 	}
-	else if(%climb > %lclimb)
+	else if(%progress > %lclimb)
 	{
 		%this.AEOnMedClimb(%obj, %slot);
 	}
