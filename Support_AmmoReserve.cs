@@ -1053,17 +1053,15 @@ package aeAmmo
 			{
 				for(%s = 0; %s < 4; %s++)
 				{
-					for(%w = 0; %w < getWordCount(%types); %w++)
+					if(%pl.tool[%i] == %db)
 					{
-						%type = getWord(%types, %w);
-						if(isObject(%pl.tool[%i].aeAmmo[%type]) && %pl.aeAmmo[%i, %type, %s] $= "" && %ammo[%type, %s] !$= "")
-							%pl.aeAmmo[%i, %type, %s] = %ammo[%type, %s];
-					}
+						for(%w = 0; %w < getWordCount(%types); %w++)
+						{
+							%type = getWord(%types, %w);
+								%pl.aeAmmo[%i, %type, %s] = %ammo[%type, %s];
+						}
 
-					if(NameToID(%pl.tool[%i].AEType) == NameToID(%db.AEType) && %pl.aeAmmo[%i, "", %s] $= "")
-					{
-						if(%ammo["", %s] !$= "")
-							%pl.aeAmmo[%i, "", %s] = %ammo["", %s];
+						%pl.aeAmmo[%i, "", %s] = %ammo["", %s];
 						
 						%break = 1;
 					}
