@@ -1944,8 +1944,8 @@ function serverCmdGunInfo(%client)
 	%damagefarval = %image.projectileDamage * %image.projectileFalloffDamage * $Pref::AEBase::playerDamageMult;
 	%headshotval = %image.projectileHeadshotMult * $Pref::AEBase::playerHeadshotMult;
 	%damageheadval = %damageval * %headshotval;
-	%spreadval = %image.spreadMin * $Pref::AEBase::playerAccuracyMult;
-	%spreadmaxval = %image.spreadMax * $Pref::AEBase::playerAccuracyMult;
+	%spreadval = %image.spreadMin * $Pref::AEBase::playerSpreadMult;
+	%spreadmaxval = %image.spreadMax * $Pref::AEBase::playerSpreadMult;
 
 	%val = mClampF(%image.projectileVelocity, 0, 200) / 200; // ae i hate you die die die
 	%velocitycol = (%val > 0.3333 ? (%val > 0.6667 ? %high : %med) : %low);
