@@ -8,6 +8,11 @@ datablock StaticShapeData(AEBulletStaticShape)
 	shapeFile = "./newbullet.dts";
 };
 
+datablock StaticShapeData(AEStealthBulletStaticShape)
+{
+	shapeFile = "./newbulletstealth.dts";
+};
+
 function getBounceVector(%vector, %normal)
 {
 	%v = %vector;
