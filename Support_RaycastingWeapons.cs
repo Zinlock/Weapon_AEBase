@@ -22,10 +22,17 @@ function ShapeBase::fireRaycastProjectile(%pl, %img, %start, %dir)
 	%int = 100;
 	%cts = mFloor(%dist / %int);
 
+	if(%cts <= 0)
+		%cts = 1;
+
 	for(%i = 0; %i < %cts; %i++)
 	{
 		%point = vectorAdd(%start, vectorScale(%dir, %int * %i));
-		%ray = containerRayCast(%point, vectorAdd(%point, vectorScale(%dir, %int)), %mask, %pl, %pl.getObjectMount());
+
+		if(%i >= %cts - 1)
+			%ray = containerRayCast(%point, vectorAdd(%point, vectorScale(%dir, %range - (%int * %i))), %mask, %pl, %pl.getObjectMount());
+		else
+			%ray = containerRayCast(%point, vectorAdd(%point, vectorScale(%dir, %int)), %mask, %pl, %pl.getObjectMount());
 		%col = getWord(%ray, 0);
 
 		if(!isObject(%col))
