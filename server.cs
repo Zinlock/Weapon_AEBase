@@ -248,6 +248,11 @@ function ae_calculateDamagePosition(%pl,%hitPos) // taken from swollow's code bu
 		return "upbody";
 }
 
+function GameConnection::bottomPrint(%cl, %text, %time, %bar)
+{
+	commandToClient(%cl, 'bottomPrint', %text, %time, %bar);
+}
+
 function ShapeBase::baadDisplayAmmo(%obj, %this)
 {
 	return;
@@ -1184,6 +1189,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 
 	%grace = %this.spreadBurst;
 
+	%spreadAdd = %this.spreadAdd;
 	%spreadMin = %this.spreadMin;
 	%spreadMax = %this.spreadMax;
 
@@ -1204,7 +1210,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		%recxm *= $Pref::AEBase::playerRecoilMult;
 		%reczm *= $Pref::AEBase::playerRecoilMult;
 
-
+		%spreadAdd *= %spreadMult;
 		%spreadMin *= %spreadMult;
 		%spreadMax *= %spreadMult;
 
@@ -1221,6 +1227,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		%recxm *= $Pref::AEBase::botRecoilMult;
 		%reczm *= $Pref::AEBase::botRecoilMult;
 
+		%spreadAdd *= %spreadMult;
 		%spreadMin *= %spreadMult;
 		%spreadMax *= %spreadMult;
 
@@ -1237,49 +1244,83 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		if(%obj.burst[%this, %slot] <= %grace)
 		{
 			if(%obj.burst[%this, %slot] == 1)
-			{
-				%spreadMin = %this.spreadBase;
-
-				if(%obj.getClassName() $= "Player")
-					%spreadMin *= %spreadMult;
-				else
-					%spreadMax *= %spreadMult;
-			}
+				%spreadMin = %this.spreadBase * %spreadMult;
+			
+			%obj.lastSpray[%this, %slot] = 0;
 			%vector = vectorAdd(%vector, (%spreadMin / %d) * (getRandom() - 0.5) SPC (%spreadMin / %d) * (getRandom() - 0.5) SPC (%spreadMin / %d) * (getRandom() - 0.5));
 		}
 		else
 		{
-			%spread = mFloatLerp(%spreadMax, %spreadMin, %obj.spray[%this, %slot]);
+			if(%this.useNewSpread)
+				%spread = mClampF(%spreadMin + %spreadAdd * (%obj.burst[%this, %slot] - %grace), 0, %spreadMax);
+			else
+				%spread = mFloatLerp(%spreadMax, %spreadMin, %obj.spray[%this, %slot]);
 
 			%spreadx = (%spread / %d) * (getRandom() - 0.5);
 			%spready = (%spread / %d) * (getRandom() - 0.5);
 			%spreadz = (%spread / %d) * (getRandom() - 0.5);
 
-			if(%recz > 0)
+			if(%this.useNewSpread)
 			{
-				%climb = (%obj.burst[%this, %slot] - %grace) * %recz;
-				%climb = mClampF(%climb, 0.0, %reczm);
-				%progress = 0 + %climb / %reczm * (1 - 0);
-				%climb += (%spreadz / 2);
+				%recz /= 100;
+				%recx /= 100;
+				%reczm /= 100;
+				%recxm /= 100;
+
+				if(%recz > 0)
+				{
+					%climb = (%obj.burst[%this, %slot] - %grace) * %recz;
+					%climb = mClampF(%climb, 0.0, %reczm);
+					%progress = %climb / %reczm;
+				}
+				else
+					%climb = 0;
+				
+				%fwd = %obj.getForwardVector();
+				%rvec = getWord(%fwd, 1) SPC (getWord(%fwd, 0) * -1) SPC getWord(%fwd, 2);
+
+				%rec = mClampF(%obj.lastSpray[%this, %slot] + ((%obj.burst[%this, %slot] - %grace) * %recx * (getRandom() * 2 - 1)), -%recxm, %recxm);
+				
+				%sub = vectorScale(%rvec, %rec);
+
+				%recoilx = getWord(%sub, 0);
+				%recoily = getWord(%sub, 1);
+
+				// drawArrow(%obj.getMuzzlePoint(%slot), %vector, "1 0 0 0.5", 1, 0.2).schedule(1000, delete);
+				// drawArrow(vectorAdd(%obj.getMuzzlePoint(%slot), %vector), %sub, "1 0 0 0.5", 10, 0.2).schedule(1000, delete);
+
+				%obj.lastSpray[%this, %slot] = %rec;
+				%vector = vectorAdd(%vector, %spreadx + %recoilx SPC %spready + %recoily SPC %spreadz + %climb);
 			}
 			else
-				%climb = 0;
+			{
+				if(%recz > 0)
+				{
+					%climb = (%obj.burst[%this, %slot] - %grace) * %recz;
+					%climb = mClampF(%climb, 0.0, %reczm);
+					%progress = 0 + %climb / %reczm * (1 - 0);
+					%climb += (%spreadz / 2);
+				}
+				else
+					%climb = 0;
+
+				%bound = (%obj.burst[%this, %slot] - %grace) * %recx;
+				%bound = %bound * %obj.boundDir[%this, %slot];
+
+				// I honestly don't even know how the fuck this works anymore
+				if(%obj.dirFlip[%this, %slot] <= %obj.burst[%this, %slot])
+				{
+					%bound = (%bound + (-%obj.boundDir[%this, %slot] * (%obj.burst[%this, %slot] - %obj.dirFlip[%this, %slot]) / (100 * 0.35)));
+				}
+
+				%bound = mClampF(%bound, -%recxm, %recxm);
+				
+				%vector = vectorAdd(%vector, %spreadx + %bound SPC %spready + %bound SPC %spreadz + %climb);
+			}
 
 			%obj.climb[%this, %slot] = %climb;
 			%obj.spray[%this, %slot] = %progress;
 
-			%bound = (%obj.burst[%this, %slot] - %grace) * %recx;
-			%bound = %bound * %obj.boundDir[%this, %slot];
-
-			// I honestly don't even know how the fuck this works anymore
-			if(%obj.dirFlip[%this, %slot] <= %obj.burst[%this, %slot])
-			{
-				%bound = (%bound + (-%obj.boundDir[%this, %slot] * (%obj.burst[%this, %slot] - %obj.dirFlip[%this, %slot]) / (100 * 0.35)));
-			}
-
-			%bound = mClampF(%bound, -%recxm, %recxm);
-
-			%vector = vectorAdd(%vector, %spreadx + %bound SPC %spready + %bound SPC %spreadz + %climb);
 			%vector = vectorNormalize(%vector);
 		}
 
