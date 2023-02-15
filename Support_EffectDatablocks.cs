@@ -490,8 +490,8 @@ datablock ProjectileData(AETrailedProjectile)
     velInheritFactor    = 0;
 
     armingDelay         = 0;
-    lifetime            = 1000;
-    fadeDelay           = 500;
+    lifetime            = 6000;
+    fadeDelay           = 5900;
     bounceElasticity    = 0.5;
     bounceFriction      = 0.20;
     isBallistic         = true;
