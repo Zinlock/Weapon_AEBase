@@ -1796,7 +1796,7 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 				%vec = vectorAdd(%vec, "0 0 " @ %pl.climb[%img, %slot]);
 
 			%pos = %pl.getMuzzlePoint(%slot);
-			%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType;
+			%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType | $TypeMasks::InteriorObjectType;
 
 			if(%img.laserDistance > 1)
 			{
