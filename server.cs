@@ -2,33 +2,33 @@ function AEBase_RegisterPrefs()
 {
 	if ($RTB::Hooks::ServerControl)
 	{
-		RTB_registerPref("Player Damage Multiplier", "AEBase - Player", "$Pref::AEBase::playerDamageMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Damage to Vehicle Multiplier", "AEBase - Player", "$Pref::AEBase::playerVehicleDamageMult", "int 0 50", "Weapon_AEBase", 0.25, false, false, "");
-		RTB_registerPref("Player Headshot Multiplier", "AEBase - Player", "$Pref::AEBase::playerHeadshotMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Spread Multiplier", "AEBase - Player", "$Pref::AEBase::playerSpreadMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Sniper Hipfire Spread Multiplier", "AEBase - Player", "$Pref::AEBase::playerSniperHipfireSpreadMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Recoil Multiplier", "AEBase - Player", "$Pref::AEBase::playerRecoilMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Screenshake Multiplier", "AEBase - Player", "$Pref::AEBase::playerScreenshakeMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Tagging Strength Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Player Tagging Recovery Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagRecoveryMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Damage Multiplier", "AEBase - Player", "$Pref::AEBase::playerDamageMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Damage to Vehicle Multiplier", "AEBase - Player", "$Pref::AEBase::playerVehicleDamageMult", "num 0 50", "Weapon_AEBase", 0.25, false, false, "");
+		RTB_registerPref("Player Headshot Multiplier", "AEBase - Player", "$Pref::AEBase::playerHeadshotMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Spread Multiplier", "AEBase - Player", "$Pref::AEBase::playerSpreadMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Sniper Hipfire Spread Multiplier", "AEBase - Player", "$Pref::AEBase::playerSniperHipfireSpreadMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Recoil Multiplier", "AEBase - Player", "$Pref::AEBase::playerRecoilMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Screenshake Multiplier", "AEBase - Player", "$Pref::AEBase::playerScreenshakeMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Tagging Strength Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Player Tagging Recovery Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagRecoveryMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs","list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
-		RTB_registerPref("Bot Damage Multiplier", "AEBase - Bot", "$Pref::AEBase::botDamageMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Damage to Vehicle Multiplier", "AEBase - Bot", "$Pref::AEBase::botVehicleDamageMult", "int 0 50", "Weapon_AEBase", 0.25, false, false, "");
-		RTB_registerPref("Bot Headshot Multiplier", "AEBase - Bot", "$Pref::AEBase::botHeadshotMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Spread Multiplier", "AEBase - Bot", "$Pref::AEBase::botSpreadMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Sniper Hipfire Spread Multiplier", "AEBase - Bot", "$Pref::AEBase::botSniperHipfireSpreadMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Recoil Multiplier", "AEBase - Bot", "$Pref::AEBase::botRecoilMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Tagging Strength Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Bot Tagging Recovery Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagRecoveryMult", "int 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Damage Multiplier", "AEBase - Bot", "$Pref::AEBase::botDamageMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Damage to Vehicle Multiplier", "AEBase - Bot", "$Pref::AEBase::botVehicleDamageMult", "num 0 50", "Weapon_AEBase", 0.25, false, false, "");
+		RTB_registerPref("Bot Headshot Multiplier", "AEBase - Bot", "$Pref::AEBase::botHeadshotMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Spread Multiplier", "AEBase - Bot", "$Pref::AEBase::botSpreadMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Sniper Hipfire Spread Multiplier", "AEBase - Bot", "$Pref::AEBase::botSniperHipfireSpreadMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Recoil Multiplier", "AEBase - Bot", "$Pref::AEBase::botRecoilMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Tagging Strength Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Bot Tagging Recovery Multiplier", "AEBase - Bot", "$Pref::AEBase::botTagRecoveryMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Spawn Bot Projectiles As", "AEBase - Bot", "$Pref::AEBase::projectilesAsBot", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
 		RTB_registerPref("HUD Style","AEBase - HUD","$Pref::AEBase::HUD","list AEBase 0 T+T 1 Adventure_Pack 2 Rallypack 3 SWeps 4 GCats 5 Verbal 6 BKT 7 Blockality 8 Nekram 9 Tactical 10 None 11","Weapon_AEBase",0,0,1);
 		RTB_registerPref("HUD Position","AEBase - HUD","$Pref::AEBase::HUDPos","list Bottom_Right 0 Bottom_Left 1 Bottom_Center 2 Center 3 Center_Right 4 Center_Left 5","Weapon_AEBase",0,0,1);
 
 		RTB_registerPref("Blood Impact Sounds", "AEBase - Misc.", "$Pref::AEBase::bloodsound", "bool", "Weapon_AEBase", true, false, false, "");
-		RTB_registerPref("Flashlight Blinding Multiplier", "AEBase - Misc.", "$Pref::AEBase::flashlightBlind", "int 0 2", "Weapon_AEBase", 1, false, false, "");
-		RTB_registerPref("Laser Blinding Multiplier", "AEBase - Misc.", "$Pref::AEBase::laserBlind", "int 0 2", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Flashlight Blinding Multiplier", "AEBase - Misc.", "$Pref::AEBase::flashlightBlind", "num 0 2", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Laser Blinding Multiplier", "AEBase - Misc.", "$Pref::AEBase::laserBlind", "num 0 2", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Aim Down Sights", "AEBase - Misc.", "$Pref::AEBase::ads", "list All 0 Scoped 1 None 2", "Weapon_AEBase", 0, false, false, "");
 		RTB_registerPref("Bullet Suppression", "AEBase - Misc.", "$Pref::AEBase::suppression", "bool", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Muzzle Flash Extra Glow Effect", "AEBase - Misc.", "$Pref::AEBase::muzzleFlash", "bool", "Weapon_AEBase", 1, false, false, "");
