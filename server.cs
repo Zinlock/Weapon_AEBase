@@ -1249,6 +1249,16 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 	for(%i = 0; %i < %this.projectileCount; %i++)
 	{
 		%vector = %obj.getMuzzleVector(%slot);
+		if(%obj.isMounted() && %obj.getObjectMount().getControllingObject() == %obj)
+		{
+			%vector = %obj.getEyeVector();
+			%mask = $TypeMasks::PlayerObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::StaticShapeObjectType | $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType;
+			%ray = containerRayCast(%src, vectorAdd(%src, vectorScale(%vector, 512)), %mask, %obj, %obj.getObjectMount());
+
+			if(isObject(%ray))
+				%vector = vectorNormalize(vectorSub(posFromRaycast(%ray), %src));
+		}
+
 		if(%obj.burst[%this, %slot] <= %grace)
 		{
 			if(%obj.burst[%this, %slot] == 1)
