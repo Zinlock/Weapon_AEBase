@@ -1187,6 +1187,14 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 	%recxm = %this.recoilWidthMax / 100;
 	%reczm = %this.recoilHeightMax / 100;
 
+	if(%this.useNewSpread)
+	{
+		%recz /= 100;
+		%recx /= 100;
+		%reczm /= 100;
+		%recxm /= 100;
+	}
+
 	%grace = %this.spreadBurst;
 
 	%spreadAdd = %this.spreadAdd;
@@ -1262,11 +1270,6 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 
 			if(%this.useNewSpread)
 			{
-				%recz /= 100;
-				%recx /= 100;
-				%reczm /= 100;
-				%recxm /= 100;
-
 				if(%recz > 0)
 				{
 					%climb = (%obj.burst[%this, %slot] - %grace) * %recz;
