@@ -856,7 +856,7 @@ function Player::BipodVelocityCheck(%pl)
 package WeaponFeatures
 {
 	function Armor::doDismount(%this, %obj, %forced) {
-		if(%obj.isMounted() && isObject(%img = %obj.getMountedImage(0)) && %img.item.aebase && !%forced)
+		if(%obj.isMounted() && isObject(%img = %obj.getMountedImage(0)) && isObject(%img.scopingImage) && %img.item.aebase && !%forced)
 		{
 			if($Pref::AEBase::ads == 0 || %img.scopingImage.isScopedImage || %img.scopingImage $= %img.sourceImage)
 				return;
