@@ -1692,15 +1692,6 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 
 	%off = %img.laserOffStates;
 
-	// if(%img.scopeSway)
-	// {
-	// 	if(getSimTime() - %pl.lastSwayTime > 3500)
-	// 	{
-	// 		%pl.spawnExplosion(AESwayProjectile, "0.06 0.06 0.06");
-	// 		%pl.lastSwayTime = getSimTime();
-	// 	}
-	// }
-
 	if((getWordCount(%off) <= 0 || !hasItemOnList(%off, %pl.getImageState(%slot))))
 	{
 		if(isObject(%cl = %pl.client) && !%cl.IsA("AIPlayer") && (%col = $AEClient_LaserColor[%cl.getBLID()]) !$= "")
@@ -1712,6 +1703,18 @@ function ShapeBase::aeLaserLoop(%pl, %img, %slot)
 
 			if(getSimTime() - %pl.lastShotTime[%img, %slot] < %img.spreadReset)
 				%vec = vectorAdd(%vec, "0 0 " @ %pl.climb[%img, %slot]);
+
+			if(%img.useNewSpread)
+			{
+				if(getSimTime() - %pl.lastShotTime[%img, %slot] < %img.spreadReset)
+				{
+					%fwd = %pl.getForwardVector();
+					%rvec = getWord(%fwd, 1) SPC (getWord(%fwd, 0) * -1) SPC getWord(%fwd, 2);
+
+					%sub = vectorScale(%rvec, %pl.lastSpray[%img, %slot]);
+					%vec = vectorAdd(%vec, %sub);
+				}
+			}
 
 			%pos = %pl.getMuzzlePoint(%slot);
 			%mask = $TypeMasks::StaticShapeObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::PlayerObjectType | $TypeMasks::InteriorObjectType;
