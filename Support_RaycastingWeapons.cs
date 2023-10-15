@@ -15,7 +15,7 @@ function ShapeBase::fireRaycastProjectile(%pl, %img, %start, %dir)
 			$TypeMasks::PlayerObjectType |
 			$TypeMasks::VehicleObjectType |
 			$TypeMasks::TerrainObjectType |
-			$TypeMasks::StaticObjectType;
+			$trapStaticTypemask;
   %start = vectorAdd(%start, vectorScale(%dir, -%range/1000));
 
 	%dist = vectorDist(%start, %end);

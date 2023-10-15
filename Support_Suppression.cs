@@ -79,7 +79,7 @@ function AESuppressArea(%pos, %dir, %shape, %img)
 
 		if(%dist < %img.whizzDistance && %dot <= %angle && getRandom() <= %chance)
 		{
-			if(%through || !isObject(containerRayCast(%pos, %eye, $TypeMasks::fxBrickObjectType | $TypeMasks::StaticObjectType)))
+			if(%through || !isObject(containerRayCast(%pos, %eye, $TypeMasks::fxBrickObjectType | $trapStaticTypemask)))
 			{
 				%shape.suppressed[%obj] = true;
 				%cc.play3D(%sfx, %pos);

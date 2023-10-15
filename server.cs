@@ -86,6 +86,8 @@ function AEBase_RegisterPrefs()
 
 AEBase_RegisterPrefs();
 
+$trapStaticTypemask = $TypeMasks::InteriorObjectType | $TypeMasks::TerrainObjectType | $TypeMasks::StaticShapeObjectType; // workaround for rebuilt
+
 $ae_HighIronsFOV = 55;
 $ae_LowIronsFOV = 75;
 $ae_HighScopeFOV = 8;

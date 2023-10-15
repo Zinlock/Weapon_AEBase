@@ -57,7 +57,7 @@ function createStaticHitscan_aebase(%player, %sourceImage, %initialPosition, %ve
 			$TypeMasks::PlayerObjectType |
 			$TypeMasks::VehicleObjectType |
 			$TypeMasks::TerrainObjectType |
-			$TypeMasks::StaticObjectType;
+			$trapStaticTypemask;
 	
 	%mount = 0;
 	if(isObject(%player))
