@@ -26,6 +26,7 @@ function AEMakeAmmo()
 
 	registerOutputEvent("Player", "supplyAEAmmo", %evstr @ "\tint 1 4096 20\tbool");
 	registerOutputEvent("Player", "refillAEAmmo", %evstr @ "\tbool");
+	registerOutputEvent("Player", "resetAEAmmo", %evstr @ "\tbool");
 	registerOutputEvent("Player", "setAEAmmo", %evstr @ "\tint 0 4096 20\tbool\tbool");
 
 	AEAmmoSet.add(AE_AmmoItem);
@@ -42,6 +43,11 @@ $OutputDescription_["Player", "refillAEAmmo"] = "[type] [tell]" NL
 																							 	"Entirely refills this player's AEBase reserve ammo." NL
 																								"type: Ammo type to refill" NL
 																								"tell: Lists gained ammo count";
+
+$OutputDescription_["Player", "resetAEAmmo"] = "[type] [tell]" NL
+																							 "Resets this player's AEBase reserve ammo to its default value." NL
+																							 "type: Ammo type to set" NL
+																							 "tell: Lists gained ammo count";
 
 $OutputDescription_["Player", "setAEAmmo"] = "[type] [amount] [tell] [force]" NL
 																						 "Sets this player's AEBase reserve ammo." NL
@@ -97,6 +103,33 @@ function Player::refillAEAmmo(%pl, %idx, %note)
 	%db = AEAmmoSet.ammo[%idx];
 	%last = %pl.AEReserve[%db];
 	%pl.AEReserve[%db] = %db.AEMax;
+
+	if(%note) %pl.AENotifyAmmo(%db.AEMax - %last, %db);
+}
+
+function Player::resetAEAmmo(%pl, %idx, %note)
+{
+	if(%idx == 0)
+	{
+		for(%i = 0; %i < AEAmmoSet.getCount(); %i++)
+		{
+			%ammo = AEAmmoSet.getObject(%i);
+			if(%ammo.AEAmmo !$= "ALL")
+				%pl.resetAEAmmo(%ammo.AEAmmoIdx, %note);
+		}
+
+		return;
+	}
+	
+	%db = AEAmmoSet.ammo[%idx];
+	%last = %pl.AEReserve[%db];
+
+	if($Pref::AEBase::FillReserveOnSpawn == 0)
+		%pl.AEReserve[%db] = 0;
+	else if($Pref::AEBase::FillReserveOnSpawn == 1)
+		%pl.AEReserve[%db] = %db.AERefill;
+	else if($Pref::AEBase::FillReserveOnSpawn == 2)
+		%pl.AEReserve[%db] = %db.AEMax;
 
 	if(%note) %pl.AENotifyAmmo(%db.AEMax - %last, %db);
 }
@@ -157,7 +190,7 @@ datablock ItemData(AE_HeavyRAmmoItem : AE_AmmoItem)
 	shapeFile = "./ammo/762mm.dts";
 	uiName = "A: 7.62x39mm Medium";
 	AEAmmo = "7.62x39mm Medium";
-	AEMax = 270;
+	AEMax = 210;
 	AERefill = 60;
 };
 
@@ -166,8 +199,8 @@ datablock ItemData(AE_HeavierRAmmoItem : AE_AmmoItem)
 	shapeFile = "./ammo/762mm.dts";
 	uiName = "A: 7.62x51mm Heavy";
 	AEAmmo = "7.62x51mm Heavy";
-	AEMax = 270;
-	AERefill = 60;
+	AEMax = 180;
+	AERefill = 30;
 };
 
 datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
@@ -175,7 +208,7 @@ datablock ItemData(AE_PDRAmmoItem : AE_AmmoItem)
 	shapeFile = "./ammo/556mm.dts";
 	uiName = "A: 5.7x28mm Defense";
 	AEAmmo = "5.7x28mm Defense";
-	AEMax = 270;
+	AEMax = 240;
 	AERefill = 60;
 };
 
@@ -184,7 +217,7 @@ datablock ItemData(AE_LightRAmmoItem : AE_AmmoItem)
 	shapeFile = "./ammo/556mm.dts";
 	uiName = "A: 5.56x45mm NATO";
 	AEAmmo = "5.56x45mm NATO";
-	AEMax = 270;
+	AEMax = 240;
 	AERefill = 60;
 };
 
@@ -203,7 +236,7 @@ datablock ItemData(AE_HeavySRAmmoItem : AE_AmmoItem)
 	uiName = "A: .408 Cheyenne Tactical";
 	AEAmmo = ".408 Cheyenne Tactical";
 	AEMax = 64;
-	AERefill = 12;
+	AERefill = 16;
 };
 
 datablock ItemData(AE_LightPAmmoItem : AE_AmmoItem)
@@ -211,8 +244,8 @@ datablock ItemData(AE_LightPAmmoItem : AE_AmmoItem)
 	shapeFile = "./ammo/9mm.dts";
 	uiName = "A: 9x19mm Parabellum";
 	AEAmmo = "9x19mm Parabellum";
-	AEMax = 210;
-	AERefill = 36;
+	AEMax = 270;
+	AERefill = 60;
 };
 
 datablock ItemData(AE_SuperLightPAmmoItem : AE_AmmoItem)
@@ -230,7 +263,7 @@ datablock ItemData(AE_MediumPAmmoItem : AE_AmmoItem)
 	uiName = "A: .45 ACP";
 	AEAmmo = ".45 ACP";
 	AEMax = 180;
-	AERefill = 28;
+	AERefill = 48;
 };
 
 datablock ItemData(AE_HeavyPAmmoItem : AE_AmmoItem)
@@ -272,8 +305,8 @@ datablock ItemData(AE_GrenadeLAmmoItem : AE_AmmoItem)
 datablock ItemData(AE_RocketLAmmoItem : AE_AmmoItem)
 {
 	shapeFile = "./ammo/rpg.dts";
-	uiName = "A: Rocket L.";
-	AEAmmo = "Rocket L.";
+	uiName = "A: RPG Warheads";
+	AEAmmo = "Rocket";
 	AEMax = 6;
 	AERefill = 2;
 };
