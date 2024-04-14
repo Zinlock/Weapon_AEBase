@@ -377,35 +377,35 @@ datablock AudioProfile(AEHeadshot3Sound)
    preload = true;
 };
 
-// RALLY IMPACT SOUNDS
+// BULLET IMPACT SOUNDS
 
-datablock AudioProfile(RallyImpact1Sound)
+datablock AudioProfile(BulletImpact1Sound)
 {
-   filename    = "./Generic/RallyImpact1.wav";
+   filename    = "./Generic/BulletImpact1.wav";
    description = AudioClosest3d;
    pitchRange = 25;
    preload = true;
 };
 
-datablock AudioProfile(RallyImpact2Sound)
+datablock AudioProfile(BulletImpact2Sound)
 {
-   filename    = "./Generic/RallyImpact2.wav";
+   filename    = "./Generic/BulletImpact2.wav";
    description = AudioClosest3d;
    pitchRange = 25;
    preload = true;
 };
 
-datablock AudioProfile(RallyImpact3Sound)
+datablock AudioProfile(BulletImpact3Sound)
 {
-   filename    = "./Generic/RallyImpact3.wav";
+   filename    = "./Generic/BulletImpact3.wav";
    description = AudioClosest3d;
    pitchRange = 25;
    preload = true;
 };
 
-datablock AudioProfile(RallyImpact4Sound)
+datablock AudioProfile(BulletImpact4Sound)
 {
-   filename    = "./Generic/RallyImpact4.wav";
+   filename    = "./Generic/BulletImpact4.wav";
    description = AudioClosest3d;
    pitchRange = 25;
    preload = true;

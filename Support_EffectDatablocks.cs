@@ -534,7 +534,7 @@ function AETrailedProjectile::onCollision(%this, %obj, %col, %fade, %pos, %norma
 	if(%cn !$= "Player" && %cn !$= "AIPlayer")
 	{
 		if(getRandom() > 0.75)
-			serverPlay3D(RallyImpact @ getRandom(1,4) @ Sound, %pos);
+			serverPlay3D(BulletImpact @ getRandom(1,4) @ Sound, %pos);
 	}
 }
 
