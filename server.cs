@@ -12,6 +12,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Player Tagging Strength Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Player Tagging Recovery Multiplier", "AEBase - Player", "$Pref::AEBase::playerTagRecoveryMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Spawn Player Projectiles As", "AEBase - Player", "$Pref::AEBase::projectilesAs","list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
+		RTB_registerPref("Spawn Player Projectiles From", "AEBase - Player", "$Pref::AEBase::projectilesFrom","list Muzzle 0 EyeWhileADS 1 Eye 2", "Weapon_AEBase", 1, false, false, "");
 
 		RTB_registerPref("Bot Damage Multiplier", "AEBase - Bot", "$Pref::AEBase::botDamageMult", "num 0 50", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Bot Damage to Vehicle Multiplier", "AEBase - Bot", "$Pref::AEBase::botVehicleDamageMult", "num 0 50", "Weapon_AEBase", 0.25, false, false, "");
@@ -1049,7 +1050,20 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 	if(%obj.getDamagePercent() >= 1)
 		return;
 
-	%src = %obj.getMuzzlePoint(%slot);
+	if(!%obj.IsA("Player") || !%obj.isFirstPerson() || $Pref::AEBase::projectilesFrom == 0 || ($Pref::AEBase::projectilesFrom == 1 && %this.desiredFov $= ""))
+		%src = %obj.getMuzzlePoint(%slot);
+	else
+	{
+		%src = %obj.getEyePoint();
+		%ray = containerRayCast(%src, vectorAdd(%src, %obj.getLookVector()), $TypeMasks::PlayerObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::StaticShapeObjectType |
+		                                                                     $TypeMasks::InteriorObjectType | $TypeMasks::FxBrickObjectType | $TypeMasks::TerrainObjectType, %obj, %obj.getObjectMount());
+
+		if(isObject(%ray))
+			%src = vectorAdd(posFromRaycast(%ray), vectorScale(%obj.getLookVector(), -0.1));
+		else
+			%src = vectorAdd(%src, %obj.getLookVector());
+	}
+
 	%sfx = %this.farShotSound;
 	%dist = %this.farShotDistance;
 
@@ -1168,7 +1182,11 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 
 	for(%i = 0; %i < %this.projectileCount; %i++)
 	{
-		%vector = %obj.getMuzzleVector(%slot);
+		if($Pref::AEBase::projectilesFrom == 0 || ($Pref::AEBase::projectilesFrom == 1 && %this.desiredFov $= ""))
+			%vector = %obj.getMuzzleVector(%slot);
+		else
+			%vector = %obj.getLookVector();
+
 		if(%obj.isMounted() && %obj.getObjectMount().getControllingObject() == %obj)
 		{
 			%vector = %obj.getEyeVector();
@@ -1306,8 +1324,8 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 			{
 				dataBlock = %pdata;
 				initialVelocity = vectorAdd(%velocity, "0 0 " @ %this.projectileZOffset);
-				initialPosition = %obj.getMuzzlePoint(%slot);
-				sourcePosition = %obj.getMuzzlePoint(%slot);
+				initialPosition = %src;
+				sourcePosition = %src;
 				sourceObject = %obj;
 				sourceSlot = %slot;
 				sourceImage = %this;
@@ -1341,13 +1359,13 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 		{
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vector, %this.projectileVelocity), "0 0 " @ %this.projectileZOffset));
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vec, 200), vectorScale(%obj.getVelocity(), %this.projectileInheritance)));
-			createStaticHitscan_aebase(%obj, %this, %obj.getMuzzlePoint(%slot), %vec);
+			createStaticHitscan_aebase(%obj, %this, %src, %vec);
 		}
 		else if(%projType == 2 && %this.staticHitscan || %projType == 1 || %this.staticRealHitscan)
 		{
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vector, %this.projectileVelocity), "0 0 " @ %this.projectileZOffset));
 			%vec = vectorNormalize(vectorAdd(vectorScale(%vec, 200), vectorScale(%obj.getVelocity(), %this.projectileInheritance)));
-			%obj.fireRaycastProjectile(%this, %obj.getMuzzlePoint(%slot), %vec);
+			%obj.fireRaycastProjectile(%this, %src, %vec);
 		}
 	}
 
@@ -1400,7 +1418,7 @@ function ShapeBase::AEFire(%obj,%this,%slot)
 			directDamage = %this.concBlastDamage;
 			vehicleDamage = %vehicleMult;
 			initialVelocity = vectorScale(%obj.getMuzzleVector(%slot), 100);
-			initialPosition = %obj.getMuzzlePoint(%slot);
+			initialPosition = %src;
 			sourceObject = %obj;
 			sourceSlot = %slot;
 			client = %obj.client;
