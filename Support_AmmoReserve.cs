@@ -1126,7 +1126,16 @@ package aeAmmo
 									}
 
 									if(isObject(%item.spawnBrick) && %item.static && %res)
+									{
 										%item.respawn();
+
+										$InputTarget_["Self"] = %item.spawnBrick;
+										$InputTarget_["Player"] = %pl;
+										$InputTarget_["Client"] = %pl.Client;
+										$InputTarget_["Minigame"] = getMinigameFromObject(%pl);
+
+										%item.spawnBrick.processInputEvent("onItemPickup", %pl.Client);
+									}
 
 									return;
 								}
