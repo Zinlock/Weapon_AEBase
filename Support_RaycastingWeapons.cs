@@ -16,7 +16,8 @@ function ShapeBase::fireRaycastProjectile(%pl, %img, %start, %dir)
 			$TypeMasks::VehicleObjectType |
 			$TypeMasks::TerrainObjectType |
 			$trapStaticTypemask;
-  %start = vectorAdd(%start, vectorScale(%dir, -%range/1000));
+	%start2 = %start;
+	%start = vectorAdd(%start, vectorScale(%dir, -%range/1000));
 
 	%dist = vectorDist(%start, %end);
 	%int = 100;
@@ -132,7 +133,7 @@ function ShapeBase::fireRaycastProjectile(%pl, %img, %start, %dir)
 		%y = (getWord(%dir,1) + 1) / 2;
 		%z = getWord(%dir,2) / 2;
 
-		%shape.setTransform(%start SPC VectorNormalize(%x SPC %y SPC %z) SPC mDegToRad(180));
-		%shape.setScale(%tracer SPC vectorDist(%start,%pos) SPC %tracer);
+		%shape.setTransform(%start2 SPC VectorNormalize(%x SPC %y SPC %z) SPC mDegToRad(180));
+		%shape.setScale(%tracer SPC vectorDist(%start2,%pos) SPC %tracer);
 	}
 }
