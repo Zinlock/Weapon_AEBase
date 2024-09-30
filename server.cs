@@ -25,7 +25,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Spawn Bot Projectiles As", "AEBase - Bot", "$Pref::AEBase::projectilesAsBot", "list ProjectilesOnly 0 HitscansOnly 1 ProjectilesHitscans 2 Any 3 ProjectilesHack 4", "Weapon_AEBase", 3, false, false, "");
 
 		RTB_registerPref("HUD Style","AEBase - HUD","$Pref::AEBase::HUD","list AEBase 0 T+T 1 Adventure_Pack 2 Rallypack 3 SWeps 4 GCats 5 Verbal 6 BKT 7 Blockality 8 Nekram 9 Tactical 10 None 11","Weapon_AEBase",0,0,1);
-		RTB_registerPref("HUD Position","AEBase - HUD","$Pref::AEBase::HUDPos","list Bottom_Right 0 Bottom_Left 1 Bottom_Center 2 Center 3 Center_Right 4 Center_Left 5","Weapon_AEBase",0,0,1);
+		RTB_registerPref("HUD Position","AEBase - HUD","$Pref::AEBase::HUDPos","list Bottom_Right 0 Bottom_Left 1 Bottom_Center 2 Center 3 Center_Right 4 Center_Left 5","Weapon_AEBase", 0, false, false, "");
 
 		RTB_registerPref("Blood Impact Sounds", "AEBase - Misc.", "$Pref::AEBase::bloodsound", "bool", "Weapon_AEBase", true, false, false, "");
 		RTB_registerPref("Flashlight Blinding Multiplier", "AEBase - Misc.", "$Pref::AEBase::flashlightBlind", "num 0 2", "Weapon_AEBase", 1, false, false, "");
@@ -37,10 +37,10 @@ function AEBase_RegisterPrefs()
 
 		RTB_registerPref("Ammo Pickup Sounds", "AEBase - Ammo", "$Pref::AEBase::ammosound", "bool", "Weapon_AEBase", true, false, false, "");
 		RTB_registerPref("Ammo Pickup Messages", "AEBase - Ammo", "$Pref::AEBase::ammomessage", "bool", "Weapon_AEBase", true, false, false, "");
-		RTB_registerPref("Spinning Ammo Items", "AEBase - Ammo", "$Pref::AEBase::ammoitemspin", "bool", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Spinning Ammo Items", "AEBase - Ammo", "$Pref::AEBase::ammoitemspin", "bool", "Weapon_AEBase", true, false, false, "");
 		RTB_registerPref("Enable Reserve Ammo", "AEBase - Ammo", "$Pref::AEBase::ReserveAmmo", "bool", "Weapon_AEBase", true, false, false, "");
-		RTB_registerPref("Spawn With Reserve Ammo", "AEBase - Ammo", "$Pref::AEBase::FillReserveOnSpawn", "list None 0 Default 1 Full 2", "Weapon_AEBase",1,0,1);
-		RTB_registerPref("Drop Ammo On Death", "AEBase - Ammo", "$Pref::AEBase::AmmoDeathDrop", "bool", "Weapon_AEBase",1,0,1);
+		RTB_registerPref("Spawn With Reserve Ammo", "AEBase - Ammo", "$Pref::AEBase::FillReserveOnSpawn", "list None 0 Default 1 Full 2", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Drop Ammo On Death", "AEBase - Ammo", "$Pref::AEBase::AmmoDeathDrop", "bool", "Weapon_AEBase", true, false, false, "");
 	}
 	else
 	{
