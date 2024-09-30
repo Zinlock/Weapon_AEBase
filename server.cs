@@ -34,6 +34,7 @@ function AEBase_RegisterPrefs()
 		RTB_registerPref("Bullet Suppression", "AEBase - Misc.", "$Pref::AEBase::suppression", "bool", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Muzzle Flash Extra Glow Effect", "AEBase - Misc.", "$Pref::AEBase::muzzleFlash", "bool", "Weapon_AEBase", 1, false, false, "");
 		RTB_registerPref("Enable Static Shape Tracers", "AEBase - Misc.", "$Pref::AEBase::staticTracers", "bool", "Weapon_AEBase", 1, false, false, "");
+		RTB_registerPref("Allow Damage Ramp Up", "AEBase - Misc.", "$Pref::AEBase::damageRampUp", "bool", "Weapon_AEBase", 1, false, false, "");
 
 		RTB_registerPref("Ammo Pickup Sounds", "AEBase - Ammo", "$Pref::AEBase::ammosound", "bool", "Weapon_AEBase", true, false, false, "");
 		RTB_registerPref("Ammo Pickup Messages", "AEBase - Ammo", "$Pref::AEBase::ammomessage", "bool", "Weapon_AEBase", true, false, false, "");
@@ -75,6 +76,7 @@ function AEBase_RegisterPrefs()
 		if ($Pref::AEBase::suppression $= "") $Pref::AEBase::suppression = 1;
 		if ($Pref::AEBase::muzzleFlash $= "") $Pref::AEBase::muzzleFlash = 1;
 		if ($Pref::AEBase::staticTracers $= "") $Pref::AEBase::staticTracers = 1;
+		if ($Pref::AEBase::damageRampUp $= "") $Pref::AEBase::damageRampUp = 1;
 
 		if ($Pref::AEBase::ammosound $= "") $Pref::AEBase::ammosound = 1;
 		if ($Pref::AEBase::ammomessage $= "") $Pref::AEBase::ammomessage = 1;

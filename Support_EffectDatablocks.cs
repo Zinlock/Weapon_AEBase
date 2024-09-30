@@ -515,6 +515,9 @@ function AETrailedProjectile::onCollision(%this, %obj, %col, %fade, %pos, %norma
 	if(%fallEnd $= "") %fallEnd = 128;
 	if(%fallDmg $= "") %fallDmg = 1;
 
+	if(!$Pref::AEBase::damageRampUp && %fallDmg > 1)
+		%fallDmg = 1;
+
 	%dist = vectorDist(%obj.sourcePosition, %pos);
 	%realEnd = mClampF(%fallEnd - %fallStart, 0, %fallEnd);
 	%mult = 1 - (mClampF(%dist - %fallStart, 0, %realEnd) / %realEnd);
@@ -610,6 +613,9 @@ function AETrailedProjectile::Damage(%this, %obj, %col, %fade, %pos, %normal)
 	if(%fallStart $= "") %fallStart = 0;
 	if(%fallEnd $= "") %fallEnd = 128;
 	if(%fallDmg $= "") %fallDmg = 1;
+
+	if(!$Pref::AEBase::damageRampUp && %fallDmg > 1)
+		%fallDmg = 1;
 
 	%dist = vectorDist(%obj.sourcePosition, %pos);
 	%realEnd = mClampF(%fallEnd - %fallStart, 0, %fallEnd);
