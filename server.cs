@@ -1938,7 +1938,10 @@ function serverCmdGunInfo(%client)
 	%col = "<color:";
 
 	%damageval = %image.projectileDamage * $Pref::AEBase::playerDamageMult;
-	%damagefarval = %image.projectileDamage * %image.projectileFalloffDamage * $Pref::AEBase::playerDamageMult;
+	if($Pref::AEBase::damageRampUp || %image.projectileFalloffDamage <= 1)
+		%damagefarval = %image.projectileDamage * %image.projectileFalloffDamage * $Pref::AEBase::playerDamageMult;
+	else
+		%damagefarval = %image.projectileDamage;
 	%headshotval = %image.projectileHeadshotMult * $Pref::AEBase::playerHeadshotMult;
 	%damageheadval = %damageval * %headshotval;
 	%spreadval = %image.spreadMin * $Pref::AEBase::playerSpreadMult;
@@ -1979,7 +1982,7 @@ function serverCmdGunInfo(%client)
 	messageClient(%client, '', %format @ "Fire rate<font:arial:20>\c6: " @ %rpmcol @ %item.RPM @ "\c6 rpm");
 	messageClient(%client, '', %format @ "Muzzle velocity<font:arial:20>\c6: " @ %velocitycol @ %image.projectileVelocity @ "\c6 u/s");
 
-	if(%image.projectileFalloffDamage !$= "" && %image.projectileFalloffStart !$= "" && %image.projectileFalloffEnd !$= "")
+	if(%damagefarval != %damageval && %image.projectileFalloffDamage !$= "" && %image.projectileFalloffStart !$= "" && %image.projectileFalloffEnd !$= "")
 	{
 		messageClient(%client, '', %format @ "Direct damage<font:arial:20>\c6: " @
 		(%image.projectileCount > 1 ? "\c2" @ %image.projectileCount @ "\c6x " : "") @ %damagecol @ %damageval @ "\c6 dmg at \c2" @ %image.projectileFalloffStart * 2 @ " \c6st to" @
