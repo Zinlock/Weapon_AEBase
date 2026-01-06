@@ -189,7 +189,7 @@ datablock ItemData(AE_DeathAmmoItem : AE_AmmoItem)
 
 datablock ItemData(AE_LightAmmoItem : AE_AmmoItem)
 {
-	shapeFile = "./ammo/762mm.dts";
+	shapeFile = "./ammo/light.dts";
 	uiName = "A: Light Ammo";
 	AEAmmo = "Light Ammo";
 	AEMax = 210;
@@ -198,7 +198,7 @@ datablock ItemData(AE_LightAmmoItem : AE_AmmoItem)
 
 datablock ItemData(AE_MediumAmmoItem : AE_AmmoItem)
 {
-	shapeFile = "./ammo/762mm.dts";
+	shapeFile = "./ammo/medium.dts";
 	uiName = "A: Medium Ammo";
 	AEAmmo = "Medium Ammo";
 	AEMax = 300;
@@ -207,7 +207,7 @@ datablock ItemData(AE_MediumAmmoItem : AE_AmmoItem)
 
 datablock ItemData(AE_HeavyAmmoItem : AE_AmmoItem)
 {
-	shapeFile = "./ammo/762mm.dts";
+	shapeFile = "./ammo/heavy.dts";
 	uiName = "A: Heavy Ammo";
 	AEAmmo = "Heavy Ammo";
 	AEMax = 240;
@@ -216,7 +216,7 @@ datablock ItemData(AE_HeavyAmmoItem : AE_AmmoItem)
 
 datablock ItemData(AE_ShotgunAmmoItem : AE_AmmoItem)
 {
-	shapeFile = "./ammo/762mm.dts";
+	shapeFile = "./ammo/shotgun.dts";
 	uiName = "A: Shotgun Ammo";
 	AEAmmo = "Shotgun Ammo";
 	AEMax = 150;
@@ -225,7 +225,7 @@ datablock ItemData(AE_ShotgunAmmoItem : AE_AmmoItem)
 
 datablock ItemData(AE_SpecialAmmoItem : AE_AmmoItem)
 {
-	shapeFile = "./ammo/762mm.dts";
+	shapeFile = "./ammo/special.dts";
 	uiName = "A: Special Ammo";
 	AEAmmo = "Special Ammo";
 	AEMax = 12;

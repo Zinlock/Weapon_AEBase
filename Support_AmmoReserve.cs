@@ -709,23 +709,23 @@ function serverCmdDropAmmo(%cl, %a0, %a1, %a2, %a3, %a4, %a5, %a6, %a7) // TODO:
 
 function Player::AENotifyAmmo(%pl, %amt, %type)
 {
-	if(%amt <= 0)
-		return;
+    if(%amt <= 0)
+        return;
 
-	if($Pref::AEBase::ammosound && getSimTime() - %pl.lastPickupSound > 100)
-	{
-		serverPlay3D(AEAmmoPickupSound, %pl.getPosition());
-		%pl.lastPickupSound = getSimTime();
-	}
+    if($Pref::AEBase::ammosound && getSimTime() - %pl.lastPickupSound > 100)
+    {
+        serverPlay3D(AEAmmoPickupSound, %pl.getPosition());
+        %pl.lastPickupSound = getSimTime();
+    }
 
-	if(isObject(%img = %pl.getMountedImage(0)) && %img.item.aebase)
-		%pl.baadDisplayAmmo(%img);
+    if(isObject(%img = %pl.getMountedImage(0)) && %img.item.aebase)
+        %pl.baadDisplayAmmo(%img);
 
-	if(!isObject(%cl = %pl.Client) || !isObject(%type) || %type.AEAmmo $= "ALL")
-		return;
+    if(!isObject(%cl = %pl.Client) || !isObject(%type) || %type.AEAmmo $= "ALL")
+        return;
 
-	if($Pref::AEBase::ammomessage)
-		messageClient(%cl, '', "<font:arial bold:14><color:f8fc03>+" @ %amt SPC %type.aeAmmo @ " ammo");
+    if($Pref::AEBase::ammomessage)
+        messageClient(%cl, 'MsgClientKilled', "<font:arial bold:14><color:f8fc03>+" @ %amt SPC %type.aeAmmo);
 }
 
 function Player::AEDumpAmmo(%pl)
