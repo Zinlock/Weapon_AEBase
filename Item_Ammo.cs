@@ -165,11 +165,10 @@ datablock ItemData(AE_AmmoItem : hammerItem)
 {
 	iconName = "";
 	image = "";
-	doColorShift = true;
-	colorShiftColor = "0.471 0.471 0.471 1.000";
+	//doColorShift = true;
+	//colorShiftColor = "0.471 0.471 0.471 1.000";
 
-	shapeFile = "base/data/shapes/brickweapon.dts";
-	//shapeFile = "./dts/ammo/cache.dts";
+	shapeFile = "./ammo/cache.dts";
 	uiName = "A: Ammo Supply";
 
 	AEIsAmmo = true;
