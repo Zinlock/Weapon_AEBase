@@ -165,14 +165,15 @@ datablock ItemData(AE_AmmoItem : hammerItem)
 {
 	iconName = "";
 	image = "";
-	//doColorShift = true;
-	//colorShiftColor = "0.471 0.471 0.471 1.000";
+	doColorShift = false;
+	colorShiftColor = "1 1 1 1";
 
 	shapeFile = "./ammo/cache.dts";
 	uiName = "A: Ammo Supply";
 
 	AEIsAmmo = true;
 	AEAmmo = "ALL";
+	iconName = "./ammo/Icon_Supply";
 };
 
 datablock ItemData(AE_DeathAmmoItem : AE_AmmoItem)
@@ -193,6 +194,7 @@ datablock ItemData(AE_LightAmmoItem : AE_AmmoItem)
 	AEAmmo = "Light Ammo";
 	AEMax = 210;
 	AERefill = 30;
+	iconName = "./ammo/Icon_Light";
 };
 
 datablock ItemData(AE_MediumAmmoItem : AE_AmmoItem)
@@ -202,6 +204,7 @@ datablock ItemData(AE_MediumAmmoItem : AE_AmmoItem)
 	AEAmmo = "Medium Ammo";
 	AEMax = 300;
 	AERefill = 60;
+	iconName = "./ammo/Icon_Medium";
 };
 
 datablock ItemData(AE_HeavyAmmoItem : AE_AmmoItem)
@@ -211,6 +214,7 @@ datablock ItemData(AE_HeavyAmmoItem : AE_AmmoItem)
 	AEAmmo = "Heavy Ammo";
 	AEMax = 240;
 	AERefill = 60;
+	iconName = "./ammo/Icon_Heavy";
 };
 
 datablock ItemData(AE_ShotgunAmmoItem : AE_AmmoItem)
@@ -220,6 +224,7 @@ datablock ItemData(AE_ShotgunAmmoItem : AE_AmmoItem)
 	AEAmmo = "Shotgun Ammo";
 	AEMax = 150;
 	AERefill = 10;
+	iconName = "./ammo/Icon_Shotgun";
 };
 
 datablock ItemData(AE_SpecialAmmoItem : AE_AmmoItem)
@@ -229,6 +234,7 @@ datablock ItemData(AE_SpecialAmmoItem : AE_AmmoItem)
 	AEAmmo = "Special Ammo";
 	AEMax = 12;
 	AERefill = 2;
+	iconName = "./ammo/Icon_Special";
 };
 
 schedule(0, 0, AEMakeAmmo);
